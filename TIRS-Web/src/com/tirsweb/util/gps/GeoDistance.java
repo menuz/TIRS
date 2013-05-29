@@ -7,6 +7,8 @@
  */
 package com.tirsweb.util.gps;
 
+import com.tirsweb.model.Point;
+
 public class GeoDistance {
 	private static double EARTH_RADIUS = 6378137.00; // 地球半径(m)
 
@@ -39,5 +41,14 @@ public class GeoDistance {
 		s = s * EARTH_RADIUS;
 		s = Math.round(s * 10000) / 10000;
 		return s;
+	}
+	
+	public static double computeCompareDistance(Point p1, Point p2) {
+		return computeCompareDistance(p1.getLat(), p1.getLon(), p2.getLat(), p2.getLon());
+	}
+	
+	public static void main(String[] args) {
+		double dis = computeCompareDistance(30.00, 120.00, 30.01, 120.00);
+		System.out.println("dis = " + dis);
 	}
 }

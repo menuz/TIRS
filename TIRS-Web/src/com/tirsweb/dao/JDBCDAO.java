@@ -17,24 +17,24 @@ public class JDBCDAO extends BaseDAO{
 	private static String user = "root";
 	private static String password = "gpsserver!@#$%";*/	
 	
-	/* *//** Oracle数据库连接URL*//*
+	 /** Oracle数据库连接URL*/
     private final static String url = "jdbc:oracle:thin:@192.168.1.111:1521:tirs1";
-    *//** Oracle数据库连接驱动*//*
+    /** Oracle数据库连接驱动*/
     private final static String driver = "oracle.jdbc.driver.OracleDriver";
-    *//** 数据库用户名*//*
+    /** 数据库用户名*/
     private final static String user = "HZGPS_TAXI";
-    *//** 数据库密码*//*
+    /** 数据库密码*/
     private final static String password = "HZGPS_TAXI";
-    */
+    
     
     /** Oracle数据库连接URL*/
-    private final static String url = "jdbc:hive://127.0.0.1:10000/default";
-    /** Oracle数据库连接驱动*/
+   /* private final static String url = "jdbc:hive://127.0.0.1:10000/default";
+    *//** Oracle数据库连接驱动*//*
     private final static String driver = "org.apache.hadoop.hive.jdbc.HiveDriver";
-    /** 数据库用户名*/
+    *//** 数据库用户名*//*
     private final static String user = "";
-    /** 数据库密码*/
-    private final static String password = "";
+    *//** 数据库密码*//*
+    private final static String password = "";*/
 
 	/**
 	 * 
@@ -54,8 +54,8 @@ public class JDBCDAO extends BaseDAO{
 		Connection conn = null;
 		try {
 			conn = DriverManager.getConnection(url, user, password);
-			if (conn!= null && !conn.isClosed())
-				System.out.println("Succeeded connecting to the Database!");
+			if (conn!= null && !conn.isClosed());
+				// System.out.println("Succeeded connecting to the Database!");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -64,6 +64,7 @@ public class JDBCDAO extends BaseDAO{
 	
 	public static void main(String[] args) {
 		JDBCDAO dao = new JDBCDAO();
+		dao.getConn();
 	}
 }
 

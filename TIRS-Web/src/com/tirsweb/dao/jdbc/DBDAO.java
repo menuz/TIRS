@@ -5,7 +5,7 @@
  * 日期：Apr 22, 2013
  * Copyright by menuz
  */
-package com.tirsweb.dao;
+package com.tirsweb.dao.jdbc;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,6 +15,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.tirsweb.dao.JDBCDAO;
 import com.tirsweb.model.GPS;
 import com.tirsweb.util.TableLoader;
 
@@ -34,7 +35,8 @@ public class DBDAO extends JDBCDAO{
 				+ time1
 				+ "' and '"
 				+ time2
-				+ "' and rownum <= " + v_num;
+				+ "' and rownum <= " + v_num
+				+ " order by message_id asc";
 		
 System.out.println("sql = " + sql);		
         Connection conn = null;
