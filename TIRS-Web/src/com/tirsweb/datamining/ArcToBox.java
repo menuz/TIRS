@@ -58,7 +58,9 @@ public class ArcToBox {
 	 */
 	public void mapping(Arc arc) {
 		ArrayList<ArcDetail> arcDetailList = arc.getArcDetailList();
-		Set<Integer> boxSet = new HashSet<Integer>();
+		Set<Integer> boxSet = new HashSet<Integer>();	
+		
+// System.out.println("arc_id "  + arc.getId());
 		
 		// get boxlist
 		double length = 0;
@@ -66,11 +68,14 @@ public class ArcToBox {
 		for (i = 0; i < arcDetailList.size() - 1; i++) {
 			ArcDetail arcDetail1 = arcDetailList.get(i);
 			ArcDetail arcDetail2 = arcDetailList.get(i+1);
-System.out.println(arcDetail1.getLati() + "    " + arcDetail1.getLongi());
+// System.out.println(arcDetail1.getLati() + "    " + arcDetail1.getLongi());
 			Point p = cache.marGpsToGps(arcDetail1.getLati(), arcDetail1.getLongi());
-System.out.println(p.getLat() + "    "  + p.getLon());
+//System.out.println(p.getLat() + "    "  + p.getLon());
+
+			// need to gaijin
 			int boxId = Box.getBoxId(p.getLat(), p.getLon());
-System.out.println("boxid = " + boxId);
+			
+//System.out.println("boxid = " + boxId);
 			
 			double tmp = GeoDistance.computeCompareDistance(arcDetail1.getLati(), arcDetail1.getLongi(), 
 					arcDetail2.getLati(), arcDetail2.getLongi());
@@ -86,11 +91,14 @@ System.out.println("boxid = " + boxId);
 		// parse set to list
 		ArrayList<Integer> boxList = new ArrayList<Integer>();
 		boxList.addAll(boxSet);
-System.out.println("123");
+//System.out.println("123");
+		
+		System.out.println("----------" + arc.getId() + "----------");
 		for (Integer integer : boxList) {
-			System.out.println(integer);
+			System.out.print(integer+"->");
 		}
-System.out.println("456");
+		System.out.println();
+//System.out.println("456");
 		
 		// set result to arc
 		arc.setBoxList(boxList);
@@ -98,7 +106,6 @@ System.out.println("456");
 	}
 	
 	public static void main(String[] args) {
-		
 		// 1. init info
 		ArcToBoxDAO dao =  new ArcToBoxDAO();
 		// get all arc, arc has arc detail
@@ -133,14 +140,17 @@ System.out.println("index = " + idx);
 			String sql = arc.getTbArcUpdateSql();			
 			sqlList.add(sql);
 		}
-		FileHelper fileHelper = new FileHelper("tb_arc_update_0529.sql", "append", sqlList);
+		FileHelper fileHelper = new FileHelper("tb_arc_update_0530.sql", "append", sqlList);
+		fileHelper.write();
 		
 		// get box and arc mapping relationship , one box has many arc mapping
 		sqlList = new ArrayList<String>();
 		for(Arc arc : arcList) {
 			String sql = arc.getTbArcBoxInsertSql();
+			sqlList.add(sql);
 		}
-		fileHelper = new FileHelper("tb_arc_box_insert_0529.sql", "append", sqlList);
+		fileHelper = new FileHelper("tb_arc_box_insert_0530.sql", "append", sqlList);
+		fileHelper.write();
 	}
 }
 

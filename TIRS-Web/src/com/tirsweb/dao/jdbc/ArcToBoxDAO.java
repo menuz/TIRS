@@ -97,7 +97,7 @@ public class ArcToBoxDAO extends JDBCDAO {
 	        ResultSet rs = null;
 	        
 	        // String sql = "select * from (select * from tb_arc_detail tad, tb_arc ta where tad.arc_id = ta.id order by tad.arc_id asc, tad.idx asc) a where rownum < 20";
-		    String sql = "select * from tb_arc_detail tad, tb_arc ta where tad.arc_id = ta.id and ta.id = 1 order by tad.arc_id asc, tad.idx asc";
+		    String sql = "select * from tb_arc_detail tad, tb_arc ta where tad.arc_id = ta.id order by tad.arc_id asc, tad.idx asc";
 	        try {
 		    	conn = getConn();
 		    	stmt = conn.prepareStatement(sql);

@@ -122,6 +122,9 @@ System.out.println("offsetlat = " + offsetlat + " offsetlon = " + offsetlon);
 			String sql = "select * from tb_arc_box where arc_id = " + arcId;
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(sql);
+			
+			System.out.println(sql);
+			
 			while(rs.next()) { 
 				int _arcId = rs.getInt("arc_id");
 				int _boxId = rs.getInt("box_id");

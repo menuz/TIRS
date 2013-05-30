@@ -9,30 +9,26 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
-  
-  <servlet>  
-        <servlet-name>Test</servlet-name>  
-        <servlet-class>  
+  <servlet>
+    <servlet-name>Test</servlet-name>
+    <servlet-class>  
             com.tirsweb.Test
-        </servlet-class>  
-    </servlet>  
-    <servlet-mapping>  
-        <servlet-name>Test</servlet-name>  
-        <url-pattern>/Test</url-pattern>  
-    </servlet-mapping>  
-    
-    <servlet>  
-        <servlet-name>PublicXMLFeed</servlet-name>  
-        <servlet-class>  
+        </servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Test</servlet-name>
+    <url-pattern>/Test</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>PublicXMLFeed</servlet-name>
+    <servlet-class>  
             com.tirsweb.PublicXMLFeed
-        </servlet-class>  
-    </servlet>  
-    <servlet-mapping>  
-        <servlet-name>PublicXMLFeed</servlet-name>  
-        <url-pattern>/PublicXMLFeed</url-pattern>  
-    </servlet-mapping>  
-  
-  
+        </servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>PublicXMLFeed</servlet-name>
+    <url-pattern>/PublicXMLFeed</url-pattern>
+  </servlet-mapping>
   <resource-ref>
     <description>Oracle Datasource example</description>
     <res-ref-name>jdbc/myoracle</res-ref-name>

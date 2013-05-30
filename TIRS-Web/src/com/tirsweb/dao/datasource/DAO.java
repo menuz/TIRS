@@ -124,7 +124,7 @@ public class DAO extends DataSourceDAO {
 		Statement stmt = null;
 		ResultSet rs = null;
 
-		String sql = "select * from tb_parking_location where arcid = " + arcid;
+		String sql = "select * from tb_parking_location where arc_id = " + arcid;
 		System.out.println(sql);
 		try {
 			conn = getConn();
@@ -207,6 +207,7 @@ public class DAO extends DataSourceDAO {
 			rs = stmt.executeQuery(sql);
 			while (rs.next()) {
 				NodePoint point = new NodePoint(
+						rs.getInt("arc_id"),
 						rs.getDouble("lati"),
 						rs.getDouble("longi")
 				);
@@ -234,8 +235,11 @@ public class DAO extends DataSourceDAO {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rs = null;
+		//  select * from tb_arc_box  tab, tb_arc ta where tab.arc_id = ta.id and tab.box_id = 536
+		// select tmp.arc_id as arc_id , tn1.lati as lati1, tn1.longi as longi1, tn2.lati as lati2, tn2.longi as longi2 from tb_node tn1, tb_node tn2 , (select * from tb_arc_box  tab, tb_arc ta where tab.arc_id = ta.id and tab.box_id = 536) tmp where tn1.id = tmp.start_node_id and tn2.id = tmp.end_node_id
 
-		String sql = "select tn1.lati as lati1, tn1.longi as longi1, tn2.lati as lati2, tn2.longi as longi2 from tb_node tn1, tb_node tn2 , (select * from tb_arc_box  tab, tb_arc ta where tab.arc_id = ta.id and tab.box_id = " + boxid + ") tmp where tn1.id = tmp.start_node_id and tn2.id = tmp.end_node_id";
+
+		String sql = "select tmp.arc_id as arc_id, tn1.lati as lati1, tn1.longi as longi1, tn2.lati as lati2, tn2.longi as longi2 from tb_node tn1, tb_node tn2 , (select * from tb_arc_box  tab, tb_arc ta where tab.arc_id = ta.id and tab.box_id = " + boxid + ") tmp where tn1.id = tmp.start_node_id and tn2.id = tmp.end_node_id";
 		System.out.println(sql);
 		try {
 			conn = getConn();
@@ -243,10 +247,12 @@ public class DAO extends DataSourceDAO {
 			rs = stmt.executeQuery(sql);
 			while (rs.next()) {
 				NodePoint point1 = new NodePoint(
+						rs.getInt("arc_id"),
 						rs.getDouble("lati1"),
 						rs.getDouble("longi1")
 				);
 				NodePoint point2 = new NodePoint(
+						rs.getInt("arc_id"),
 						rs.getDouble("lati2"),
 						rs.getDouble("longi2")
 				);

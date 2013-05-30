@@ -1,3 +1,4 @@
+
 <%@ page language="java" pageEncoding="GBK"%>
 <!DOCTYPE html>
 <html>
@@ -658,6 +659,20 @@ function arc_node_play() {
 	arcIntervalId = window.setInterval("getNodeDetail()", 1000);
 }
 
+function setWindow(lati, longi, content) {
+/* 	alert("content" + content);
+ */	infowindow = new google.maps.InfoWindow();
+	infowindow.setContent(content);
+	g = new google.maps.LatLng(lati, longi);
+	marker = new google.maps.Marker({
+		position : g,
+		title : '#',
+		map : map,
+		icon : 'image/red.png'
+	});
+	infowindow.open(map, marker);
+}
+
 function arc_node(id, start_node_id, end_node_id, lati1, longi1, lati2, longi2) {
 	 var infowindow1 = new google.maps.InfoWindow();
      infowindow1.setContent(id + '  ' + start_node_id);
@@ -742,8 +757,7 @@ function arc_push(arcid, latStr, lonStr) {
 
 /**
  * show all arc
- */arc_play
-
+ */
 function arc_query() {
 	jQuery.ajax({
 				url : "PublicXMLFeed",
@@ -886,6 +900,9 @@ function arc_query() {
 		});
 	}
 	
+ /*-------------------------------------------------- box ----------------------------------------------*/ 
+
+	
 	function box(boxid) {
 		jQuery
 		.ajax({
@@ -916,10 +933,21 @@ function arc_query() {
 								.getElementsByTagName("node");
 
 						gpses = new Array();
+						
 
+						var polyOptions = {
+								strokeColor : '#000000',
+								strokeOpacity : 1.0,
+								strokeWeight : 3
+							}
+						
+						// arc cross box
 						for ( var i = 0; i < pointlist.length; i=i+2) {
+							id =pointlist[i].getAttribute("id");
 							lati_correct1 = pointlist[i].getAttribute("latitude_correct");							
 							longi_correct1 = pointlist[i].getAttribute("longitude_correct");
+							
+							setWindow(lati_correct1, longi_correct1, 'Arc' + id);
 							
 							lati_correct2 = pointlist[i+1].getAttribute("latitude_correct");							
 							longi_correct2 = pointlist[i+1].getAttribute("longitude_correct");
@@ -952,9 +980,9 @@ function arc_query() {
 							poly = new google.maps.Polyline(polyOptions);
 							poly.setMap(map);
 							var path = poly.getPath();
-							path.push(p1);
+						    path.push(p1);
 							path.push(p2);
-						}
+						} 
 						
 						poly = new google.maps.Polyline(polyOptions);
 						poly.setMap(map);
@@ -963,16 +991,96 @@ function arc_query() {
 						poly_correct = new google.maps.Polyline(polyOptions);
 						poly_correct.setMap(map);
 						var path_correct = poly_correct.getPath();
+						
+						// node green node is real gps red node is correct gpss
 						for ( var i = 0; i < nodelist.length; i++) {
 							lati = nodelist[i].getAttribute("latitude");							
 							longi = nodelist[i].getAttribute("longitude");
 							
 							lati_correct = nodelist[i].getAttribute("latitude_correct");							
 							longi_correct = nodelist[i].getAttribute("longitude_correct");
-
+							
+							id = nodelist[i].getAttribute("id");
+							
 							p = new google.maps.LatLng(lati, longi);
 							
 							p_correct = new google.maps.LatLng(lati_correct, longi_correct);
+							
+							/* marker = new google.maps.Marker({
+								position : p,
+								title : '#',
+								map : map,
+								icon : 'image/green.png'
+							});
+							marker.setMap(map); */
+							
+							if(i==0) {
+								setWindow(lati_correct, longi_correct, 'Box ' + id);
+							}
+							
+							 marker_correct = new google.maps.Marker({
+								position : p_correct,
+								title : '#',
+								map : map,
+								icon : 'image/red.png'
+							});
+							marker_correct.setMap(map); 
+							
+							//path.push(p);
+							 path_correct.push(p_correct); 
+						}
+					}
+				}
+			}
+		});
+	}
+ 
+	/*-------------------------------------------------- arc ----------------------------------------------*/ 
+
+function arcdetail(arcid) {
+		jQuery
+		.ajax({
+			url : "PublicXMLFeed",
+			data : {
+				command : "line",
+				content : "arcdetail+"+arcid
+			},
+			complete : function(xhr, textStatus) {
+				if (xhr.readyState == 4) {
+					if (xhr.status == 200 || xhr.status == 304) {
+						var xmlText = xhr.responseText;
+						if (window.ActiveXObject) {
+							xmldoc = new ActiveXObject(
+									"Microsoft.XMLDOM");
+							xmldoc.async = "false";
+							xmldoc.loadXML(xmlText);
+						} else {
+							parser = new DOMParser();
+							xmldoc = parser.parseFromString(xmlText,
+									"text/xml");
+						}
+
+						var mapType = map.getMapTypeId();
+						var pointlist = xmldoc
+								.getElementsByTagName("point");
+
+						gpses = new Array();
+
+
+						/* var polyOptions = {
+								strokeColor : '#000000',
+								strokeOpacity : 1.0,
+								strokeWeight : 3
+							}
+						
+						poly = new google.maps.Polyline(polyOptions);
+						poly.setMap(map);
+						var path = poly.getPath();
+						for ( var i = 0; i < pointlist.length; i=i+1) {
+							lati = pointlist[i].getAttribute("latitude");							
+							longi = pointlist[i].getAttribute("longitude");
+							
+							p = new google.maps.LatLng(lati, longi);
 							
 							marker = new google.maps.Marker({
 								position : p,
@@ -982,23 +1090,45 @@ function arc_query() {
 							});
 							marker.setMap(map);
 							
-							marker_correct = new google.maps.Marker({
-								position : p_correct,
+							path.push(p);
+						} */
+						
+						
+						var polyOptions = {
+								strokeColor : '#000000',
+								strokeOpacity : 1.0,
+								strokeWeight : 3
+							}
+						
+						poly = new google.maps.Polyline(polyOptions);
+						poly.setMap(map);
+						var path = poly.getPath();
+						for ( var i = 0; i < pointlist.length; i=i+1) {
+							id = pointlist[i].getAttribute("id");
+							lati = pointlist[i].getAttribute("latitude_correct");							
+							longi = pointlist[i].getAttribute("longitude_correct");
+							
+							if(i==0) {
+								setWindow(lati, longi, 'Arc ' + id);
+							}
+							
+							p = new google.maps.LatLng(lati, longi);
+							
+							marker = new google.maps.Marker({
+								position : p,
 								title : '#',
 								map : map,
 								icon : 'image/red.png'
 							});
-							marker_correct.setMap(map);
+							marker.setMap(map);
 							
 							path.push(p);
-							path_correct.push(p_correct);
 						}
 					}
 				}
 			}
 		});
 	}
-
 </script>
 
 </head>

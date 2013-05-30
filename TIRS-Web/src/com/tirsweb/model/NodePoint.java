@@ -11,14 +11,32 @@ public class NodePoint extends Point {
 	int row;
 	int column;
 	
+	int id;
+	
 	public NodePoint() {
 		
 	}
 	
+	public NodePoint(int row, int column, int id) {
+		super();
+		this.row = row;
+		this.column = column;
+		this.id = id;
+	}
+
 	public NodePoint(double lati, double longi) {
 		super(lati, longi);
 	}
 	
+	public NodePoint(int id, double lati, double longi) {
+		super(lati, longi);
+		this.id = id;
+	}
+	
+	public int getId() {
+		return id;
+	}
+
 	public NodePoint(String lati, String longi) {
 		super(lati, longi);
 	}

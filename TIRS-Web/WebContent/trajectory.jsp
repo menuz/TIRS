@@ -124,6 +124,11 @@
 		var boxid = document.getElementById("boxid").value;
 		self.parent.frames["map"].box(boxid);
 	}
+	
+	function arcdetail() {
+		var arcid = document.getElementById("arcid").value;
+		self.parent.frames["map"].arcdetail(arcid);
+	}
 </script>
 <title>实时轨迹信息</title>
 </head>
@@ -243,6 +248,24 @@
 		<tr>
 			<td>
 				one box contain corresponding arc
+			</td>
+		</tr>
+		
+	</table>
+	
+	<table>		
+		<tr>
+			<td width="50%">
+				<input type="text" id="arcid" value="arcid" size="10">
+			</td>  
+		</tr>
+		<tr>
+			<td width="50%"><input type="button" value="ArcDetail"
+				onclick="arcdetail()" class="btn" /></td>
+		</tr>
+		<tr>
+			<td>
+				one arc and its detail gps
 			</td>
 		</tr>
 		

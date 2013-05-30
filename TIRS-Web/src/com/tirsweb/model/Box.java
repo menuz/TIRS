@@ -7,6 +7,11 @@
  */
 package com.tirsweb.model;
 
+
+import java.util.List;
+
+import com.tirsweb.util.BoxUtil;
+
 public class Box {
 	int boxId;
 	double speed;
@@ -83,6 +88,8 @@ public class Box {
 			return -1;
 		}
 		
+		// System.out.println(lati + "  " + longi);
+		
 		java.text.DecimalFormat df = new java.text.DecimalFormat("#.00");
 		
 		if(lati.length() >= 5) lati = lati.substring(0, 5);
@@ -94,14 +101,28 @@ public class Box {
 		double minLat = 30.15;
 		double minLon = 120.00;
 		
-		int row = (int)((lat - minLat) / 0.01) + 1;
-		int col = (int)((lon - minLon) / 0.01) + 1;
+		// System.out.println("debug1: " + lat + "  " + lon);
+		
+		int row = (int)Math.round((lat - minLat) / 0.01) + 1;
+		int col = (int)Math.round((lon - minLon) / 0.01) + 1;
 		int box = 40*(row-1) + col;
+		
+		
+		// System.out.println("debug2: " + row + "  " + col);
 		
 		if(row <= 0 || col <= 0)  return -1;
 		if(row >= 25 || col >= 40) return -1;
 
 		return box;
+	}
+	
+	public static void main(String[] args) {
+		BoxUtil util = new BoxUtil();
+		List<NodePoint> nps = util.getFourNodeByBoxId(528);
+		for (NodePoint nodePoint : nps) {
+			System.out.println(nodePoint.getLat() + "  " + nodePoint.getLon());
+		}
+		
 	}
 	
 }

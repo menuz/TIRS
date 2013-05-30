@@ -100,14 +100,26 @@ public class PublicXMLFeed extends HttpServlet {
 		
 		else if ("line".equalsIgnoreCase(cmd)) {
 			 String content = new String(request.getParameter("content").getBytes("ISO-8859-1"), "utf-8");
-			
 System.out.println("content = " + content);
+			 // get trip from tb_trip to display on the map
 			 // freetrip+tripid+vehicleid+rownum
 			 // freetrip+20111201231249+20999+1
+
+			 // collect node and arc info, use nodelist to check the node, apparently it will be less useful after collecting
 			 // nodelist+dirId
 			 // nodelist+4
+
+			 // arcpoint use to check parking location in arc, arcpoint+1 means query all parking location in ssssarc_id = 1 
 			 // arcpoint+arcid
 			 // arcpoint+1
+
+			// box use to display box in map  and display the arc in box
+			// box+boxid
+			// box+528
+              
+             // arcdetail use to display arc's detail indeed
+			 // arcdetail+arcid 
+             // arcdetail+1
 			 String[] strs = content.split("[+]");		    
 			 for (String string : strs) {
 				System.out.println(string);
@@ -154,11 +166,27 @@ System.out.println("1 = " + strs[1] + " 2 = " + strs[2] + " 3 = " + strs[3]);
 						nodePoint.setLon(p.getLon());
 					}
 				}*/
-			 } else if(strs[0].equals("onearc")) {
+				 
+			 } 
+			 
+			 else if(strs[0].equals("onearc")) {
 				 points = dao.getArcByArcId(strs[1]);
-			 } else if(strs[0].equals("onearcdetail")) {
+			 } 
+		
+			 
+			 else if(strs[0].equals("onearcdetail")) {
 				 points = dao.getArcDetailByArcId(strs[1]);
-			 } else if(strs[0].equals("box")) {
+			 } 
+			 
+			 else if(strs[0].equals("arc")) {
+				 points = dao.getArcDetailByArcId(strs[1]);
+			 } 
+			 
+			 else if(strs[0].equals("arcdetail")) {
+				 points = dao.getArcDetailByArcId(strs[1]);
+			 }
+			 
+			 else if(strs[0].equals("box")) {
 				 points = dao.getCorrespondingArcListByBoxId(strs[1]);
 			 }
 
@@ -177,12 +205,30 @@ System.out.println("1 = " + strs[1] + " 2 = " + strs[2] + " 3 = " + strs[3]);
                      double lat_correct=lat, lon_correct=lon;
                      
                      if(!strs[0].equals("onearcdetail")) {
-                    	Point p = getCache().gpsToMarGPS(lat, lon);
-              			if(p != null) {
-              				lat_correct = p.getLat();
-              				lon_correct = p.getLon();
-              			}
+                    	 if(strs[0].equals("arcdetail")) {
+                    		 
+                    	 } else {
+							Point p = getCache().gpsToMarGPS(lat, lon);
+							if (p != null) {
+								lat_correct = p.getLat();
+								lon_correct = p.getLon();
+							}
+                    	 }
                      }
+                     
+                     // arc detail info is correct data, so i need to re-correct data to origin
+                     if(strs[0].equals("arcdetail")) {
+                    	 Point p = getCache().marGpsToGps(lat_correct, lon_correct);  
+                    	 if(p != null) {
+                    		 lat = p.getLat();
+                    		 lon = p.getLon();
+                    	 }
+                    	 point.addAttribute("id", strs[1]);
+                      }
+                     
+                     if(strs[0].equals("box")) {
+                    	 point.addAttribute("id", points.get(i).getId()+"");
+                      }
                      
                      point.addAttribute("latitude",String.valueOf(lat));
                      point.addAttribute("longitude",String.valueOf(lon));
@@ -191,6 +237,8 @@ System.out.println("1 = " + strs[1] + " 2 = " + strs[2] + " 3 = " + strs[3]);
                  }
              }
              
+             // box has two type return  box and arc(only start and end point)
+             // here return the box four nodes
              if(strs[0].equals("box")) {
             	 BoxUtil boxUtil = new BoxUtil();
             	 List<NodePoint> nps = boxUtil.getFourNodeByBoxId(strs[1]);
@@ -207,6 +255,7 @@ System.out.println("1 = " + strs[1] + " 2 = " + strs[2] + " 3 = " + strs[3]);
 						lon_correct = p.getLon();
 					}
                      
+					point.addAttribute("id", strs[1]);
                      point.addAttribute("latitude",String.valueOf(lat));
                      point.addAttribute("longitude",String.valueOf(lon));
                      point.addAttribute("latitude_correct",String.valueOf(lat_correct));
@@ -264,7 +313,7 @@ System.out.println("1 = " + strs[1] + " 2 = " + strs[2] + " 3 = " + strs[3]);
             out.println(document.asXML());
 	     }
 		
-		
+		// push arc detail to db from map.jsp
 		else if ("arcpush".equalsIgnoreCase(cmd)) {
 			  
 			String arcid = keyValueArr.get("arcid");
@@ -320,6 +369,8 @@ System.out.println("1 = " + strs[1] + " 2 = " + strs[2] + " 3 = " + strs[3]);
 			out.println(clusterXML);
 	     }*/
 		
+		// cluster used for display clustering algorithm result
+		// return point type: parking place in arc and the cluster point in arc
 		else if ("cluster".equalsIgnoreCase(cmd)) {
 			DAO5 dao = new DAO5();
 			ArrayList<ParkingLocation> pks = new ArrayList<ParkingLocation>();
