@@ -19,6 +19,7 @@ public class JDBCDAO extends BaseDAO{
 	
 	 /** Oracle数据库连接URL*/
     private final static String url = "jdbc:oracle:thin:@192.168.1.111:1521:tirs1";
+	// private final static String url = "jdbc:oracle:thin:@60.191.28.14:1521:webgps3";
     /** Oracle数据库连接驱动*/
     private final static String driver = "oracle.jdbc.driver.OracleDriver";
     /** 数据库用户名*/

@@ -26,11 +26,15 @@ public class Angle {
 	}
 	
 	MyVector toVector(double lati1, double longi1, double lati2, double longi2) {
-		double x = (longi2 - longi1);
-		double y = (lati2 - lati1);
+		double x = longi2*1000000 - longi1*1000000;
+		double y = lati2*1000000 - lati1*1000000;
 		MyVector vector = new MyVector(x, y); 
 		return vector;
 	}
+	
+	public MyVector getVector() {
+		return null;
+	} 
 	
 	public double angle(double lati1, double longi1, double lati2, double longi2,
 			double lati3, double longi3, double lati4, double longi4) {
@@ -70,6 +74,39 @@ public class Angle {
 		
 		System.out.println("angle1 = " + angle1);
 		System.out.println("angle2 = " + angle2);
+		
+		
+		lati1 = 30.27906;
+		longi1 = 120.1253;
+		
+		lati2 = 30.27926;
+		longi2 = 120.1286;
+		
+		lati3 = lati1;
+		longi3 = longi1;
+		
+		lati4 = 30.27815;
+		longi4 = 120.1277;
+		
+		angle1 = a.angle(lati1, longi1, lati2, longi2, lati3, longi3, lati4, longi4);
+		System.out.println("angle1 = " + angle1);
+		
+		
+		lati4 = 30.27682;
+		longi4 = 120.1254;
+		
+		angle1 = a.angle(lati1, longi1, lati2, longi2, lati3, longi3, lati4, longi4);
+		System.out.println("angle1 = " + angle1);
+		
+		
+		lati4 = 30.27733;
+		longi4 = 120.1231;
+		
+		angle1 = a.angle(lati1, longi1, lati2, longi2, lati3, longi3, lati4, longi4);
+		System.out.println("angle1 = " + angle1);
+		
+		
+		
 	}
 }
 

@@ -131,6 +131,29 @@ public class Arc {
 	public String getTbArcUpdateSql() {
 		return "update tb_arc set len = " + length + " where id = " + id + ";";
 	}
+	
+	
+	public String toString() {
+		String variable = "[id:" + id + ",start_node_id:" + this.start_node_id + ",end_node_id:" + this.end_node_id
+				+ ",lati1:" + this.lati1 + ",longi1:" + this.longi1 + ",lati2:" + this.lati2 + ",longi2:" + longi2 
+				+ ",length:" + this.length + "]";
+		
+		String arcDetailList = "[";
+		for(int i=0; i<this.arcDetailList.size(); i++) {
+			ArcDetail ad = this.arcDetailList.get(i);
+			String arcDetail = "[index:" + ad.getIdx() + ",lati:" + ad.getLati() + ",longi:" + ad.getLongi() + "]";
+			arcDetailList += (arcDetail + ",");
+		}
+		
+		String boxStr = "[";
+		for(int i=0; i<this.boxList.size(); i++) {
+			Integer ad = this.boxList.get(i);
+			String box = "[box:" + ad +"]";
+			boxStr += (box + ",");
+		}
+		
+		return variable + "\n" + arcDetailList + "\n" + boxStr;
+	}
 }
 
 

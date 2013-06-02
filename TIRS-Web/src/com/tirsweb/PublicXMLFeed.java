@@ -374,7 +374,8 @@ System.out.println("1 = " + strs[1] + " 2 = " + strs[2] + " 3 = " + strs[3]);
 		else if ("cluster".equalsIgnoreCase(cmd)) {
 			DAO5 dao = new DAO5();
 			ArrayList<ParkingLocation> pks = new ArrayList<ParkingLocation>();
-			dao.getParkingLocationByArcId(pks, 57);
+			//87 57 
+			dao.getParkingLocationByArcId(pks, 123);
 			
 			List<kMeansPoint> ps = new ArrayList<kMeansPoint>();
 			for (ParkingLocation parkingLocation : pks) {
@@ -382,12 +383,17 @@ System.out.println("1 = " + strs[1] + " 2 = " + strs[2] + " 3 = " + strs[3]);
 				ps.add(p);
 			}
 			
-			kMeans km = new kMeans(25, ps);
-			
-			km.runKMeans();
-			
-			ClusterXML2 cluster = new ClusterXML2(km, getCache());
-			out.println(cluster);
+			if(ps == null || ps.size() == 0) {
+				out.println("no point in the arc");  
+			} else {
+				int k = (int)Math.sqrt(ps.size());
+				kMeans km = new kMeans(4, ps);
+  
+				km.runKMeans();
+
+				ClusterXML2 cluster = new ClusterXML2(km, getCache());
+				out.println(cluster);
+			}
 			/*System.out.println(km.getCluster(0).getMean());
 			System.out.println(km.getCluster(1).getMean());
 			System.out.println(km.getCluster(2).getMean());

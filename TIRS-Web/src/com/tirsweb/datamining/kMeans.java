@@ -79,7 +79,6 @@ public class kMeans {
 	 *            List containing objects of type kMeansPoint
 	 */
 	public kMeans(int k, List kMeansPoints) {
-
 		this.k = k;
 		this.inputFileName = inputFileName;
 		this.clusters = new cluster[this.k];

@@ -14,6 +14,11 @@ import com.tirsweb.dao.jdbc.DAO5;
 import com.tirsweb.model.ParkingLocation;
 import com.tirsweb.util.gps.GeoDistance;
 
+/**
+ * 
+ * @author menuz  disable
+ *
+ */
 public class Kmeans2    
 {   
     double[][] sample;//ËùÓÐÑù±¾Êý¾Ý   

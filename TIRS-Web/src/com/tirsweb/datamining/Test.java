@@ -27,7 +27,7 @@ public class Test {
 		System.out.println(Math.abs((tt2-tt1)/1000));
 	}*/
 	
-	/*public static void main(String[] args) {
+	public static void main(String[] args) {
 		ArrayList<Integer> arcList = new ArrayList<Integer>();
 		arcList.add(3);
 		arcList.add(3);
@@ -54,6 +54,8 @@ public class Test {
 		double totalDis = 0.0;
 		int count = 0;
 		int startIdx = 0;
+		
+		
 		for (int i = 0; i < arcList.size(); i++) {
 			int arcIdTmp = arcList.get(i);
 			if(arcIdTmp != arcId) {
@@ -67,7 +69,7 @@ public class Test {
 		if(arcId != -2 && arcId != -1) {
 			System.out.println(startIdx + "  " + (arcList.size()-1) + "  " + arcId);
 		}
-	}*/
+	}
 	
 	/*public static void main(String[] args) {
 		String arcAndAverageSpeed = "4+20.9";
@@ -89,7 +91,7 @@ public class Test {
 		// System.out.println(c);
 	}*/
 	
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		String str = "1";
 		int arcid = 1;
 		
@@ -98,7 +100,7 @@ public class Test {
 		} else {
 			System.out.println("1!=1");
 		}
-	}
+	}*/
 }
 
 

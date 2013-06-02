@@ -160,11 +160,11 @@ private final String TAG = "CacheDAO ";
 				int box_id = rs.getInt("box_id");
 				
 				if(boxid != box_id) {
-					arcid = arc_id;
-					boxid = box_id;
 					if(arcList != null) {
 						boxAndArcMap.put(boxid, arcList);
 					}
+					arcid = arc_id;
+					boxid = box_id;
 					arcList = new ArrayList<Integer>();
 				}
 				arcList.add(arc_id);
