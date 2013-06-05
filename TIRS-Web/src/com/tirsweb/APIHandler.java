@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.tirsweb.dao.jdbc.DBDAO;
 import com.tirsweb.model.Arc;
+import com.tirsweb.model.ArcDetail;
 import com.tirsweb.model.ArcDis;
 import com.tirsweb.model.Box;
 import com.tirsweb.model.GPS;
@@ -18,6 +19,8 @@ import com.tirsweb.model.Point;
 import com.tirsweb.model.Speed;
 import com.tirsweb.model.Up;
 import com.tirsweb.model.xml.XMLParkingLocationCluster;
+import com.tirsweb.model.xml.XMLPoint;
+import com.tirsweb.routing.Dijkstra;
 import com.tirsweb.util.ArcUtil;
 import com.tirsweb.util.BoxUtil;
 import com.tirsweb.util.FindUpLocationUtil;
@@ -26,9 +29,10 @@ import com.tirsweb.util.cache.Cache;
 import com.tirsweb.util.gps.GeoDistance;
 import com.tirsweb.util.gps.GpsConverter;
 import com.tirsweb.util.xml.ErrorXML;
+import com.tirsweb.util.xml.FindPassengerXML;
 import com.tirsweb.util.xml.FindUpLocationXML;
 import com.tirsweb.util.xml.GPSXML;
-import com.tirsweb.util.xml.RouteXML;
+import com.tirsweb.util.xml.RouteScheduleXML;
 
 /**
  * 
@@ -267,7 +271,7 @@ System.out.println("lati " + latitude + " longi " + longitude + " uploadTime " +
 		double longi2 = 0;
 		
 		// object list for xml displaying
-		ArrayList<XMLParkingLocationCluster> xmlObjectList = new ArrayList<XMLParkingLocationCluster>();
+		// ArrayList<XMLParkingLocationCluster> xmlObjectList = new ArrayList<XMLParkingLocationCluster>();
 		for(int i=0; i<arcDisList.size(); i++) {
 			if(i==3) break;
 			
@@ -278,11 +282,11 @@ System.out.println("lati " + latitude + " longi " + longitude + " uploadTime " +
 			}
 			
 			// change to xml format
-			for (ParkingLocationCluster plc : plClusterList) {
+			/*for (ParkingLocationCluster plc : plClusterList) {
 				XMLParkingLocationCluster xmlObject = new XMLParkingLocationCluster(plc.getId(), plc.getLati(), plc.getLongi(), 
 						plc.getGpsCount(), plc.getArcId(), i+1);
 				xmlObjectList.add(xmlObject);
-			}
+			}*/
 			
 			// get the nearest arc and get the hottest spot in this arc
 			if(i==0) {
@@ -305,80 +309,101 @@ System.out.println("lati " + latitude + " longi " + longitude + " uploadTime " +
 			}
 		}
 		
-		if(xmlObjectList == null) {
-			return new ErrorXML().errorType(ErrorXML.ARCPARKINGLOCATIONCLUSTERERROR);
-		}
-		
+		// Step3  get the neigboring node as startnode and endnode 
 		// 出租车起点
 		double lati1 = Double.parseDouble(latitude);
 		double longi1 = Double.parseDouble(longitude);
-		
+		int arcid1 = ArcUtil.GpsToArcId(cache, lati, longi);
 		
 		// 前往的停靠点
 		// real gps to map gps
+		int arcid2 = ArcUtil.GpsToArcId(cache, lati2, longi2);
+		
+		ArrayList<Integer> startAndEndNode = ArcUtil.calStartNodeAndEndNode(cache, arcid1, arcid2);
+		
+		int startNodeId = startAndEndNode.get(0);
+		int endNodeId = startAndEndNode.get(1);
+		
+		// Step4  use kmeans to build up route between startnode and endnode
+		ArrayList<Integer> pathList = new Dijkstra().findShortestPath(startNodeId, endNodeId);
+		
+		// Step5  return points
+		// start point
+		lati1 = lati1;
+		longi1 = longi1;
+		
+		// interval point 
+		ArrayList<XMLPoint> points = new ArrayList<XMLPoint>();
+		for(int i=0; i<pathList.size() - 1; i++) {
+			int _startNodeId = pathList.get(i);
+			int _endNodeId = pathList.get(i+1);
+			Arc arc = cache.queryArcWithStartAndEndNode(_startNodeId, _endNodeId);
+			ArrayList<ArcDetail> arcDetailList = arc.getArcDetailList();
+			for(ArcDetail arcDetail : arcDetailList) {
+				XMLPoint point = new XMLPoint(arcDetail.getLati(), arcDetail.getLongi(), arc.getId(), arcDetail.getIdx());
+				points.add(point);
+			}
+		}
+		
+		// end point
 		p = cache.gpsToMarGPS(lati2, longi2);
 		lati2 = p.getLat();
 		longi2 = p.getLon();
 
-		// Step3  get the neigboring node as startnode and endnode 
-
-		// Step4  use kmeans to build up route between startnode and endnode
-
-		// Step5  return points
-		
-		
-		/*int boxId = ParamConvertor.getBoxLocation(lati, longi);
-		int weekday = ParamConvertor.getWeekday(uploadTime);
-		int hour = ParamConvertor.getHour(uploadTime);
-		
-		ArrayList<Integer> boxFilter = new ArrayList<Integer>();
-		boxFilter.add(boxId);
-		Map<Integer, Speed> boxSpeedMap = new HashMap<Integer, Speed>();
-		Map<Integer, Up> boxUpMap = new HashMap<Integer, Up>();*/
-		
-		ArrayList<Point> pointList = new ArrayList<Point>();
-		p = new Point(lati, longi);
-		pointList.add(p);
-		pointList.add(new Point(30.26263, 120.09160));
-		
-		/*int boxid1 = getBoxId(boxSpeedMap, boxUpMap, boxFilter, boxId, weekday, hour);
-		getGPSByBoxId(pointList, boxid1, weekday, hour);
-		
-		int boxid2 = getBoxId(boxSpeedMap, boxUpMap, boxFilter, boxId, weekday, hour);
-		getGPSByBoxId(pointList, boxid2, weekday, hour);*/
-		
-		RouteXML routeXML = new RouteXML(pointList);
-		return routeXML.toString();
+		FindPassengerXML findPassengerXML = new FindPassengerXML(lati1, longi1, points, lati2, longi2);
+		return findPassengerXML.toString();
 	}
 	
 	public String routeschedule(double latiS,double longiS, double latiE, double longiE, String uploadTime) {
+		// Step3 get the neigboring node as startnode and endnode
+		Point ps = cache.marGpsToGps(latiS, longiS);
+		Point pe = cache.marGpsToGps(latiE, longiE);
 		
-		return "";
+		// 出租车起点
+		int arcid1 = ArcUtil.GpsToArcId(cache, ps.getLat(), ps.getLon());
+
+		// 前往的停靠点
+		// real gps to map gps
+		int arcid2 = ArcUtil.GpsToArcId(cache, pe.getLat(), ps.getLon());
+
+		ArrayList<Integer> startAndEndNode = ArcUtil.calStartNodeAndEndNode(
+				cache, arcid1, arcid2);
+
+		int startNodeId = startAndEndNode.get(0);
+		int endNodeId = startAndEndNode.get(1);
+
+		// Step4 use kmeans to build up route between startnode and endnode
+		ArrayList<Integer> pathList = new Dijkstra().findShortestPath(
+				startNodeId, endNodeId);
+
+		// Step5 return points
+		// start point
+		double lati1 = latiS;
+		double longi1 = longiS;
+
+		// interval point
+		ArrayList<XMLPoint> points = new ArrayList<XMLPoint>();
+		for (int i = 0; i < pathList.size() - 1; i++) {
+			int _startNodeId = pathList.get(i);
+			int _endNodeId = pathList.get(i + 1);
+			Arc arc = cache.queryArcWithStartAndEndNode(_startNodeId,
+					_endNodeId);
+			ArrayList<ArcDetail> arcDetailList = arc.getArcDetailList();
+			for (ArcDetail arcDetail : arcDetailList) {
+				XMLPoint point = new XMLPoint(arcDetail.getLati(),
+						arcDetail.getLongi(), arc.getId(), arcDetail.getIdx());
+				points.add(point);
+			}
+		}
+
+		// end point
+		double lati2 = latiE;
+		double longi2 = longiE;
+
+		RouteScheduleXML routeScheduleXML = new RouteScheduleXML(lati1, longi1,
+				points, lati2, longi2);
+		return routeScheduleXML.toString();
 	}
-	
-	/*public String findpassenger(String lati, String longi, String uploadTime) {
-		System.out.println("lati " + lati + " longi " + longi + " uploadTime " + uploadTime );
-				
-				int boxId = ParamConvertor.getBoxLocation(lati, longi);
-				int weekday = ParamConvertor.getWeekday(uploadTime);
-				int hour = ParamConvertor.getHour(uploadTime);
-				
-				ArrayList<Integer> boxFilter = new ArrayList<Integer>();
-				boxFilter.add(boxId);
-				Map<Integer, Speed> boxSpeedMap = new HashMap<Integer, Speed>();
-				Map<Integer, Up> boxUpMap = new HashMap<Integer, Up>();
-				
-				StringBuffer sb = new StringBuffer();
-				sb.append(lati + "+" + longi + ",");
-				
-				int boxid1 = getBoxId(boxSpeedMap, boxUpMap, boxFilter, boxId, weekday, hour);
-				getGPSByBoxId(sb, boxid1, weekday, hour);
-				
-				int boxid2 = getBoxId(boxSpeedMap, boxUpMap, boxFilter, boxId, weekday, hour);
-				getGPSByBoxId(sb, boxid2, weekday, hour);
-				
-				return sb.toString();
-			}*/
 	
 	private void getGPSByBoxId(ArrayList<Point> pointList, int boxId, int weekday, int hour) {
 		Up up = cache.queryUpByKeys(boxId, weekday, hour);

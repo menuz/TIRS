@@ -10,9 +10,8 @@ package com.tirsweb.model;
 import java.sql.Time;
 
 public class Point {
-	public double lat;
-	public double lon;
-	public Time time;
+	protected double lat;
+	protected double lon;
 	
 	public Point() {}
 	
@@ -20,20 +19,6 @@ public class Point {
 		super();
 		this.lat = lat;
 		this.lon = lon;
-	}
-
-	public Point(double lat, double lon, Time time) {
-		super();
-		this.lat = lat;
-		this.lon = lon;
-		this.time = time;
-	}
-	public Time getTime() {
-		return time;
-	}
-
-	public void setTime(Time time) {
-		this.time = time;
 	}
 
 	public Point(String lati, String longi) {

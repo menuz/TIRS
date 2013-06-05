@@ -7,7 +7,6 @@
  */
 package com.tirsweb.routing;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -15,7 +14,7 @@ import java.util.Set;
 
 import com.tirsweb.model.Node;
 
-public class Dijkstra {
+public class CopyOfDijkstra {
 	Set<Node> open=new HashSet<Node>();
 	Set<Node> close=new HashSet<Node>();
 	
@@ -23,14 +22,16 @@ public class Dijkstra {
 	Map<Integer,String> pathInfo=new HashMap<Integer,String>();//封装路径信息
 	
 	Node[] nodes = null;
-	MapBuilder mapBuilder = null;
 	
-	public Dijkstra() {
-		mapBuilder = new MapBuilder();
-		this.nodes = mapBuilder.getNodeArray();
+	public CopyOfDijkstra(Node[] nodes) {
+		this.nodes = nodes;
 	}
 	
-	private Node initPath(int startNodeId){
+	public String findShortPath(int startNodeId, int endNodeId) {
+		return "";
+	}
+	
+	public Node initPath(int startNodeId){
 		//初始路径,因没有A->E这条路径,所以path(E)设置为Integer.MAX_VALUE
 		Node startNode = this.nodes[startNodeId];
 		Map<Node, Integer> childs = startNode.getChild();
@@ -62,7 +63,7 @@ public class Dijkstra {
 		return startNode;
 	}
 	
-	private void computePath(Node start){
+	public void computePath(Node start){
 		Node nearest=getShortestPath(start);//取距离start节点最近的子节点,放入close
 		if(nearest==null){
 			return;
@@ -83,7 +84,7 @@ public class Dijkstra {
 		computePath(nearest);//向外一层层递归,直至所有顶点被遍历
 	}
 	
-	private void printPathInfo(){
+	public void printPathInfo(){
 		Set<Map.Entry<Integer, String>> pathInfos=pathInfo.entrySet();
 		for(Map.Entry<Integer, String> pathInfo:pathInfos){
 			System.out.println(pathInfo.getKey()+":"+pathInfo.getValue());
@@ -109,27 +110,16 @@ public class Dijkstra {
 		return res;
 	}
 	
-	/**
-	 * 
-		 * 此方法描述的是： 
-	     * @param startNodeId
-	     * @param endNodeId
-	     * @return
-	     * @author: dmnrei@gmail.com
-	     * @version: 2013-6-5 下午8:17:50
-	 */
-	public ArrayList<Integer> findShortestPath(int startNodeId, int endNodeId) {
-		Node start = initPath(startNodeId);
-		computePath(start);
+	public static void main(String[] args) {
+		MapBuilder mapBuilder = new MapBuilder();
+		Node[] nodes = mapBuilder.getNodeArray();
 		
-		String shortestpath = pathInfo.get(endNodeId);
-		String[] split = shortestpath.split("->");
-		ArrayList<Integer> pathList = new ArrayList<Integer>();
-		for(String node : split) {
-			pathList.add(Integer.parseInt(node));
-		}
-		
-		return pathList;
+		CopyOfDijkstra test = new CopyOfDijkstra(nodes);
+
+		int startNodeId = 27;
+		Node start = test.initPath(startNodeId);
+		test.computePath(start);
+		test.printPathInfo();
 	}
 }
 

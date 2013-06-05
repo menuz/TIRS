@@ -1,5 +1,9 @@
 package com.tirsweb.util.cache;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,13 +34,20 @@ public class Cache {
 	// 
 	private Map<Integer, Integer> arcAndOppositeArcMap;
 	
+	//
+	private Map<String, Arc> startAndEndNodeMapArc;
+	
+	
 	private CacheDAO cacheDAO;
 	
 	public Cache() {
 		offsets = new HashMap<String, Point>();
 		speeds = new HashMap<String, Speed>();
 		ups = new HashMap<String, Up>();
+		
 		arcs = new HashMap<Integer, Arc>();
+		startAndEndNodeMapArc = new HashMap<String, Arc>();
+		
 		nodes = new HashMap<Integer, Node>();
 		
 		cacheDAO = new CacheDAO();
@@ -47,6 +58,8 @@ public class Cache {
 		
 		// 加在arc相关信息,包括arcdetail等信息
 		initArc();
+		initStartAndEndNodeMapArc();
+		// 加在节点信息
 		initNode();
 		
 		//
@@ -57,6 +70,10 @@ public class Cache {
 	
 	public void initArc() {
 		cacheDAO.queryAllArc(arcs);
+	}
+	
+	public void initStartAndEndNodeMapArc() {
+		cacheDAO.initStartAndEndNodeMapArc(arcs, startAndEndNodeMapArc);
 	}
 	
 	public void initNode() {
@@ -124,9 +141,19 @@ System.out.println("@Cache.gpsToMarGPS 超过纠偏范围");
 		return arcAndOppositeArcMap;
 	}
 	
+	public Arc queryArcWithStartAndEndNode(int startNodeId, int endNodeId) {
+		String key = startNodeId + "+" + endNodeId;
+		return startAndEndNodeMapArc.get(key);
+	}
+	
 	public Map<Integer, ArrayList<Integer>> queryBoxAndArcMap() {
 		return boxAndArcMap;
 	}
+	
+	public void initNodeRelation(Node[] nodes) {
+		cacheDAO.initNodeRelation(nodes);
+	}
+	
 	
 	public ArrayList<Integer> getArcListByBoxId(int boxid) {
 		ArrayList<Integer> arcList = boxAndArcMap.get(boxid);
@@ -157,8 +184,8 @@ System.out.println("@Cache.gpsToMarGPS 超过纠偏范围");
 		return arcs;
 	} 
 	
-	public Arc queryArcByArcId() {
-		return null;
+	public Arc queryArcByArcId(int arcId) {
+		return arcs.get(arcId);
 	}
 	
 	public ArrayList<ParkingLocationCluster> queryParkingLocationCluserListByArcId(int arcId) {

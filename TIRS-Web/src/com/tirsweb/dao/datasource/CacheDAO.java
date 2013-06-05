@@ -32,6 +32,37 @@ public class CacheDAO extends DataSourceDAO {
     
     /**
      * 
+    	 * 此方法描述的是：初始化node之间关系
+         * @param nodes
+         * @author: dmnrei@gmail.com
+         * @version: 2013-6-5 下午8:09:52
+     */
+    public void initNodeRelation(Node[] nodes) {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		
+		String sql = "select * from tb_arc order by id asc";
+        try {
+	    	conn = getConn();
+	    	stmt = conn.prepareStatement(sql);
+	    	rs = stmt.executeQuery(sql);
+	    	
+			while (rs.next()) {
+				int start_node_id = rs.getInt("start_node_id");
+				int end_node_id = rs.getInt("end_node_id");
+				int len = rs.getInt("len2");
+				nodes[start_node_id].getChild().put(nodes[end_node_id], len);
+	        }
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+            releaseSource(conn, stmt, rs);
+		}
+	}
+    
+    /**
+     * 
     	 * 此方法描述的是：一条路段含有两个方向，两个方向上聚簇点相同的，所以可以过滤大
          * @param arcAndOppositeArcMap
          * @author: dmnrei@gmail.com
@@ -213,6 +244,36 @@ System.out.println("offsetlat = " + offsetlat + " offsetlon = " + offsetlon);
 				arc.setBoxList(boxList);
 			}
 					
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+            releaseSource(conn, stmt, rs);
+        }
+    }
+    
+    public void initStartAndEndNodeMapArc(Map<Integer, Arc> arcs, Map<String, Arc> startAndEndNodeMapArc) {
+    	Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		
+		String sql = "select * from tb_arc";
+		// String sql = "select * from (select * from tb_arc_detail tad, tb_arc ta where tad.arc_id = ta.id order by tad.arc_id asc, tad.idx asc) a where rownum < 20";
+        try {
+	    	conn = getConn();
+	    	stmt = conn.prepareStatement(sql);
+	    	rs = stmt.executeQuery(sql);
+	    	
+			int arcid = -1;
+			//ArrayList<Arc> arcList = new ArrayList<Arc>();
+			Arc arc = null;
+			ArrayList<ArcDetail> arcDetailList = null;
+			while (rs.next()) {
+				int arc_id = rs.getInt("id");
+				int start_node_id = rs.getInt("start_node_id");
+				int end_node_id = rs.getInt("end_node_id");
+				String key = start_node_id + "+" + end_node_id;
+				startAndEndNodeMapArc.put(key, arcs.get(arc_id));
+	        }
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {

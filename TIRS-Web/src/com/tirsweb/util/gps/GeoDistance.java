@@ -7,6 +7,7 @@
  */
 package com.tirsweb.util.gps;
 
+import com.tirsweb.model.Node;
 import com.tirsweb.model.Point;
 
 public class GeoDistance {
@@ -45,6 +46,10 @@ public class GeoDistance {
 	
 	public static double computeCompareDistance(Point p1, Point p2) {
 		return computeCompareDistance(p1.getLat(), p1.getLon(), p2.getLat(), p2.getLon());
+	}
+	
+	public static double computeCompareDistance(Node n1, Node n2) {
+		return computeCompareDistance(n1.getLati(), n1.getLongi(), n2.getLati(), n2.getLongi());
 	}
 	
 	public static void main(String[] args) {
