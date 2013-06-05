@@ -42,13 +42,13 @@ public class TripToSegmentList {
 	
 	
 	// miniestDis = 3000 14401
-		// miniestDis = 300  10840
-		// miniestDis = 150  7646
-		static int MiniestDis = 150;
-		// miniestDis = 150 angle = 15  4982*2
-		// miniestDis = 150 angle = 10  3457*2
-		// miniestDis = 150 angle = 5   2278*2
-		static int MinAngle = 5;
+	// miniestDis = 300  10840
+	// miniestDis = 150  7646
+	static int MiniestDis = 150;
+	// miniestDis = 150 angle = 15  4982*2
+	// miniestDis = 150 angle = 10  3457*2
+	// miniestDis = 150 angle = 5   2278*2
+	static int MinAngle = 5;
 	
 	public static void main(String[] args) {
 		cache = new JCache();
@@ -63,24 +63,24 @@ public class TripToSegmentList {
 		dao.getArcMap(arcAndOppositeArcMap);
 		
 		ArrayList<Integer> idxs = new ArrayList<Integer>();
-		/*for(int i=1; i <= 826218; i+=10000) {
+		for(int i=1; i <= 826218; i+=20000) {
 			idxs.add(i);
 		}
-		idxs.add(826218);*/
-		idxs.add(1);
-		idxs.add(1000);
+		idxs.add(826218);
+		/*idxs.add(1);
+		idxs.add(1000);*/
 		
+		int count = 0;
 		for(int i=0; i<idxs.size()-1; i++) {
 			ArrayList<Trip> trips = cache.getTripsWithRange(idxs.get(i), idxs.get(i+1));
 			
-			int count = 0;
 			for(Trip trip : trips) {
-				System.out.println("---------------------------------- Trip ----------------------------");
+				// System.out.println("---------------------------------- Trip ----------------------------");
 				handleTrip(trip);
 				count ++;
 				System.out.println("count = " + count + "   trip id = " + trip.getTripId() + "   done");
-				System.out.println("---------------------------------- Trip ----------------------------");
-				System.out.println();
+				// System.out.println("---------------------------------- Trip ----------------------------");
+				// System.out.println();
 			}
 		}
 		
@@ -129,9 +129,9 @@ public class TripToSegmentList {
 			//System.out.print(arcid + "->");
 		}
 		//System.out.println();
-		System.out.println("Split: ArcId  StartNodeId->EndNodeId");
+		/*System.out.println("Split: ArcId  StartNodeId->EndNodeId");
 		System.out.println(sb.toString());
-		System.out.println();
+		System.out.println();*/
 		
 		// 111122223333 get 1111 2222 3333 split
 		//System.out.println("ArcId  StartIndex->EndIndex");
@@ -185,7 +185,7 @@ public class TripToSegmentList {
 			
 			sb.append("[arcid:" + temp[0] + ",speed:" + temp[1]+"];");
 		}
-		System.out.println(sb.toString());
+		// System.out.println(sb.toString());
 		
 		FileHelper fileHelper = new FileHelper("tb_arc_speed_insert_0530.sql", "append", sqlList);
 		fileHelper.write();
@@ -257,7 +257,7 @@ public class TripToSegmentList {
 		
 		int returnArcId = arcId;
 		if(arcCount >= oppositeArcCount) {
-			returnArcId = 0;
+			returnArcId = arcId;
 		} else {
 			Integer oppositeArc = arcAndOppositeArcMap.get(arcId);
 			if(oppositeArc == null) {

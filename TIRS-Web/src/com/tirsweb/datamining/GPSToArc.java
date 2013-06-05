@@ -31,7 +31,7 @@ import com.tirsweb.util.gps.GeoDistance;
  * large, then 2110 * 50000 = 1,000,000,000 calculate time is too many, so i gonna
  * use boxid as a bridge.
  * gps -> boxid -> all arcs in box -> compute which arc the gps belongs to
- * 
+ * Parking location mapping to Arc
  * @author: dmnrei@gmail.com
  * @version: May 18, 2013 10:10:18 AM
  */
@@ -198,7 +198,6 @@ public class GPSToArc {
 		System.out.println("point1:" + maps.get(1));
 		System.out.println("point2:" + maps.get(2));
 		System.out.println("point3:" + maps.get(3));
-		
 	}
 
 	/**
@@ -329,7 +328,6 @@ public class GPSToArc {
 		// get parking location to define box
 		int clostestArcId = -1;
 		int boxId = Box.getBoxId(lati, longi);
-
 		
 		// make sure gps in the hangzhou area(30.15,120.00, 30.40, 120.40)
 		if (boxId != -1) {

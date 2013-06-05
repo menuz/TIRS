@@ -117,7 +117,8 @@
 	}
 	
 	function cluster() {
-		self.parent.frames["map"].cluster();
+		var clusterid = document.getElementById("cluster").value;
+		self.parent.frames["map"].cluster(clusterid);
 	}
 	
 	function box() {
@@ -128,6 +129,11 @@
 	function arcdetail() {
 		var arcid = document.getElementById("arcid").value;
 		self.parent.frames["map"].arcdetail(arcid);
+	}
+	
+	function route() {
+		var route = document.getElementById("route").value;
+		self.parent.frames["map"].route(route);
 	}
 </script>
 <title>实时轨迹信息</title>
@@ -273,12 +279,34 @@
 	
 	<table>		
 		<tr>
+			<td width="50%">
+				<input type="text" id="cluster" value="arcid" size="10">
+			</td>  
+		</tr>
+		<tr>
 			<td><input type="button" value="Cluster"
 				onclick="cluster()" class="btn" /></td>
 		</tr>
 		<tr>
 			<td>
 				one arc and corresponding parking location
+			</td>
+		</tr>
+	</table>
+	
+	<table>		
+		<tr>
+			<td width="50%">
+				<input type="text" id="route" value="arcid1->arcid2" size="10">
+			</td>  
+		</tr>
+		<tr>
+			<td><input type="button" value="Route"
+				onclick="route()" class="btn" /></td>
+		</tr>
+		<tr>
+			<td>
+				display a routing by arcid
 			</td>
 		</tr>
 	</table>

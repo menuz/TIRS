@@ -10,9 +10,12 @@ import java.util.Map;
 import com.tirsweb.dao.DataSourceDAO;
 import com.tirsweb.model.Arc;
 import com.tirsweb.model.ArcDetail;
+import com.tirsweb.model.Node;
+import com.tirsweb.model.ParkingLocationCluster;
 import com.tirsweb.model.Point;
 import com.tirsweb.model.Speed;
 import com.tirsweb.model.Up;
+import com.tirsweb.util.TableLoader;
 
 /**
  * 
@@ -25,6 +28,103 @@ public class CacheDAO extends DataSourceDAO {
 	
     public CacheDAO() {
        super();
+    }
+    
+    /**
+     * 
+    	 * 此方法描述的是：一条路段含有两个方向，两个方向上聚簇点相同的，所以可以过滤大
+         * @param arcAndOppositeArcMap
+         * @author: dmnrei@gmail.com
+         * @version: 2013-6-5 下午2:57:19
+     */
+    public void getArcAndOppositeArcMap(Map<Integer, Integer> arcAndOppositeArcMap) {
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        String sql = "select v1.id as id1, v2.id as id2 from tb_arc v1, tb_arc v2 where v1.start_node_id = v2.end_node_id and v1.end_node_id = v2.start_node_id";
+        System.out.println(sql);
+        try {
+            conn = getConn();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+            	int id = rs.getInt("id1");
+            	int id_1= rs.getInt("id2");
+            	arcAndOppositeArcMap.put(id, id_1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            releaseSource(conn, stmt, rs);
+        }
+    }
+    
+    /**
+     * 
+    	 * 此方法描述的是：query all nodes
+         * @param nodes
+         * @author: dmnrei@gmail.com
+         * @version: 2013-6-3 上午11:07:45
+     */
+    public void queryAllNode(Map<Integer, Node> nodes) {
+    	Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		
+		String sql = "select * from tb_node";
+        try {
+	    	conn = getConn();
+	    	stmt = conn.prepareStatement(sql);
+	    	rs = stmt.executeQuery(sql);
+	    	
+			while (rs.next()) {
+				int arc_id = rs.getInt("id");
+				double lati = rs.getDouble("lati");
+				double longi = rs.getDouble("longi");
+				Node node = new Node(arc_id, lati, longi);
+				nodes.put(arc_id, node);
+	        }
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+            releaseSource(conn, stmt, rs);
+        }
+    }
+    
+    /**
+     * 
+    	 * 此方法描述的是：
+         * @param nodes
+         * @author: dmnrei@gmail.com
+         * @version: 2013-6-4 下午9:05:48
+     */
+    public void queryParkingLocationCluster(int arcId, Map<Integer, ArrayList<ParkingLocationCluster>> pkClusterListMap) {
+    	Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		
+		ArrayList<ParkingLocationCluster> plClusterList = new ArrayList<ParkingLocationCluster>();
+		
+		String sql = "select * from tb_parking_location_cluster where arc_id = " + arcId;
+        try {
+	    	conn = getConn();
+	    	stmt = conn.prepareStatement(sql);
+	    	rs = stmt.executeQuery(sql);
+	    	
+			while (rs.next()) {
+				ParkingLocationCluster pkCluster = TableLoader.loadParkingLocationCluster(rs);
+				plClusterList.add(pkCluster);
+	        }
+			
+			if(plClusterList.size() > 0) {
+				pkClusterListMap.put(arcId, plClusterList);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+            releaseSource(conn, stmt, rs);
+        }
     }
     
     
@@ -49,6 +149,75 @@ System.out.println("offsetlat = " + offsetlat + " offsetlon = " + offsetlon);
 		} finally {
 			releaseSource(conn, stmt, rs);
 		}
+    }
+    
+    
+    
+    /**
+     * 
+    	 * 此方法描述的是：
+         * @param arcMap
+         * @author: dmnrei@gmail.com
+         * @version: 2013-6-4 下午7:08:02
+     */
+    public void queryAllArc(Map<Integer, Arc> arcMap) {
+    	Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		
+		String sql = "select * from tb_arc_detail tad, tb_arc ta where tad.arc_id = ta.id order by tad.arc_id asc, tad.idx asc";
+		// String sql = "select * from (select * from tb_arc_detail tad, tb_arc ta where tad.arc_id = ta.id order by tad.arc_id asc, tad.idx asc) a where rownum < 20";
+        try {
+	    	conn = getConn();
+	    	stmt = conn.prepareStatement(sql);
+	    	rs = stmt.executeQuery(sql);
+	    	
+			int arcid = -1;
+			//ArrayList<Arc> arcList = new ArrayList<Arc>();
+			Arc arc = null;
+			ArrayList<ArcDetail> arcDetailList = null;
+			while (rs.next()) {
+				int arc_id = rs.getInt("arc_id");
+				double lati = rs.getDouble("lati");
+				double longi = rs.getDouble("longi");
+				int idx = rs.getInt("idx");
+				double length = rs.getDouble("len");
+				int start_node_id = rs.getInt("start_node_id");
+				int end_node_id = rs.getInt("end_node_id");
+				
+				if(arcid != arc_id) {
+					if(arc != null) {
+						//arcList.add(arc);
+						// add old arcid
+						arcMap.put(arcid, arc);
+						arc.setArcDetailList(arcDetailList);
+						ArrayList<Integer> boxList = getBoxListByArcId(arc_id);
+						arc.setBoxList(boxList);
+					}
+					arc = new Arc();
+					arc.setId(arc_id);
+					arc.setStart_node_id(start_node_id);
+					arc.setEnd_node_id(end_node_id);
+					arcDetailList = new ArrayList<ArcDetail>();
+					arcid = arc_id;
+				} 
+				
+			    ArcDetail arcDetail = new ArcDetail(lati, longi, idx);
+				arcDetailList.add(arcDetail);
+	        }
+			if(arc != null) {
+				// arcList.add(arc);
+				arcMap.put(arc.getId(), arc);
+				arc.setArcDetailList(arcDetailList);
+				ArrayList<Integer> boxList = getBoxListByArcId(arc.getId());
+				arc.setBoxList(boxList);
+			}
+					
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+            releaseSource(conn, stmt, rs);
+        }
     }
     
     // load boxList, arcDetailList, arc_id
@@ -108,6 +277,51 @@ System.out.println("offsetlat = " + offsetlat + " offsetlon = " + offsetlon);
             releaseSource(conn, stmt, rs);
         }
 	    return null;
+    }
+    
+    /**
+     * 
+    	 * 此方法描述的是：
+         * @param boxAndArcMap
+         * @author: dmnrei@gmail.com
+         * @version: 2013-6-4 下午6:24:57
+     */
+    public void queryAllBoxAndArcMap(Map<Integer, ArrayList<Integer>> boxAndArcMap) {
+    	Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		
+		String sql = "select * from tb_arc_box order by box_id asc";
+        try {
+	    	conn = getConn();
+	    	stmt = conn.prepareStatement(sql);
+	    	rs = stmt.executeQuery(sql);
+	    	
+			int arcid = -1;
+			int boxid = -1;
+			ArrayList<Integer> arcList = null;
+			while (rs.next()) {
+				int arc_id = rs.getInt("arc_id");
+				int box_id = rs.getInt("box_id");
+				
+				if(boxid != box_id) {
+					if(arcList != null) {
+						boxAndArcMap.put(boxid, arcList);
+					}
+					arcid = arc_id;
+					boxid = box_id;
+					arcList = new ArrayList<Integer>();
+				}
+				arcList.add(arc_id);
+	        }
+			if(boxid != -1) {
+				boxAndArcMap.put(boxid, arcList);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+            releaseSource(conn, stmt, rs);
+        }
     }
     
     

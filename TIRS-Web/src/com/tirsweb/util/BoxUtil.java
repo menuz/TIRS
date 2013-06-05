@@ -17,6 +17,35 @@ public class BoxUtil {
 		
 	}
 	
+	
+	/**
+	 * 
+		 * 此方法描述的是：获得临近的8个box
+	     * @param box
+	     * @return
+	     * @author: dmnrei@gmail.com
+	     * @version: 2013-6-5 上午9:04:30
+	 */
+	public static ArrayList<Integer> getNearBoxList(int box) {
+		int a8=box+40; int a7=a8-1; int a9=a8+1;
+		int a5=box; int a4=a5-1; int a6=a5+1;
+		int a2=box-40; int a1=a2-1; int a3=a2+1;
+		
+		ArrayList<Integer> boxlist = new ArrayList<Integer>();
+		
+		if(a1 >= 1 && a1 <= 1000) boxlist.add(a1);
+		if(a2 >= 1 && a2 <= 1000) boxlist.add(a2);
+		if(a3 >= 1 && a3 <= 1000) boxlist.add(a3);
+		if(a4 >= 1 && a4 <= 1000) boxlist.add(a4);
+		if(a5 >= 1 && a5 <= 1000) boxlist.add(a5);
+		if(a6 >= 1 && a6 <= 1000) boxlist.add(a6);
+		if(a7 >= 1 && a7 <= 1000) boxlist.add(a7);
+		if(a8 >= 1 && a8 <= 1000) boxlist.add(a8);
+		if(a9 >= 1 && a9 <= 1000) boxlist.add(a9);
+		
+		return boxlist;
+	}
+	
 	public List<NodePoint> getFourNodeByBoxId(String boxid) {
 		return getFourNodeByBoxId(Integer.parseInt(boxid));
 	}
@@ -114,7 +143,7 @@ public class BoxUtil {
 		return lonStr;
 	}
 	
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		BoxUtil util = new BoxUtil();
 		
 		List<NodePoint> nps = util.getFourNodeByBoxId(528);
@@ -122,7 +151,16 @@ public class BoxUtil {
 			System.out.println(nodePoint.getLat() + "  "  + nodePoint.getLon());
 		}
 		
-	}
+	}*/
+	
+	
+	/*public static void main(String[] args) {
+		BoxUtil util = new BoxUtil();
+		ArrayList<Integer> boxlist = (ArrayList<Integer>)util.getNearBoxList(533);
+		for (Integer integer : boxlist) {
+			System.out.println(integer);
+		}
+	}*/
 	
 	
 }

@@ -4,16 +4,16 @@
  * 版本信息： version 1.0
  * 日期：May 19, 2013
  * Copyright by menuz
- */
+ *//*
 package com.tirsweb.datamining;
 
 import java.io.*;
 
-/**
+*//**
  * 
  * @author menuz disable
  *
- */
+ *//*
 public class Kmeans3 {
 	double[][] sample;// ËùÓÐÑù±¾Êý¾Ý
 	double[][] center;// Ã¿ÖÖÀàÖÐÐÄµãµÄXYÖµ
@@ -161,4 +161,4 @@ public class Kmeans3 {
 		kmeans.Cluster();
 
 	}
-}
+}*/

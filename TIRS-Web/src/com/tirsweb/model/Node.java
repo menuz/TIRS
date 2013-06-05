@@ -13,11 +13,15 @@ import java.util.Map;
 
 public class Node {
 	private int id;
+	private String tag;
 	private double lati;
 	private double longi;
 	
 	public Node() {
-		
+	}
+	
+	public Node(String tag) {
+		this.tag = tag;
 	}
 	
 	public Node(int id, double lati, double longi) {
@@ -28,7 +32,7 @@ public class Node {
 	
 	// child  Integer is distance of two nodes
 	private Map<Node,Integer> child=new HashMap<Node,Integer>();
-	// 
+	// refresh by time
 	private long lastAccessTime;
 	
 	public Node(int id){
@@ -68,5 +72,9 @@ public class Node {
 	// quanzhi will refresh by time
 	public void refreshChild() {
 		
+	}
+
+	public String getName() {
+		return this.tag;
 	}
 }

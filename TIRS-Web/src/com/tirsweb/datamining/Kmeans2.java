@@ -4,7 +4,7 @@
  * 版本信息： version 1.0
  * 日期：May 19, 2013
  * Copyright by menuz
- */
+ *//*
 package com.tirsweb.datamining;
 
 import java.io.*;   
@@ -14,11 +14,11 @@ import com.tirsweb.dao.jdbc.DAO5;
 import com.tirsweb.model.ParkingLocation;
 import com.tirsweb.util.gps.GeoDistance;
 
-/**
+*//**
  * 
  * @author menuz  disable
  *
- */
+ *//*
 public class Kmeans2    
 {   
     double[][] sample;//ËùÓÐÑù±¾Êý¾Ý   
@@ -141,7 +141,7 @@ public class Kmeans2
        
      public static void main(String[] args)throws java.io.IOException    
      {   
-      /*   String sourcefile;   
+         String sourcefile;   
          System.out.print("Input the sourcefile's path:");   
          BufferedReader tempread = new BufferedReader(new InputStreamReader(System.in));   
          sourcefile = tempread.readLine();   
@@ -151,7 +151,7 @@ public class Kmeans2
          InputStream inputstr=new FileInputStream(sourcefile);   
          BufferedReader readline=new BufferedReader(new InputStreamReader(inputstr));   
          String everyline;   
-         Kmeans2 kmeans=new Kmeans2(10,clusterkind);   */
+         Kmeans2 kmeans=new Kmeans2(10,clusterkind);   
          
         DAO5 dao = new DAO5();
  		ArrayList<ParkingLocation> pks = new ArrayList<ParkingLocation>();
@@ -162,10 +162,10 @@ public class Kmeans2
          int cout=0;   
          while(cout<kmeans.totaln)   
          {   
-            /* everyline=readline.readLine();   
+             everyline=readline.readLine();   
              if(everyline==null)   
                  break;   
-             String[] line=everyline.split(" "); */  
+             String[] line=everyline.split(" ");   
              kmeans.sample[cout][0]=pks.get(cout).getLati();   
              kmeans.sample[cout][1]=pks.get(cout).getLongi();   
              kmeans.sample[cout][2]=-1;   
@@ -180,3 +180,4 @@ public class Kmeans2
      }   
 }   
 
+*/

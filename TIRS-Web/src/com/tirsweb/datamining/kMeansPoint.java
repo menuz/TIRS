@@ -20,13 +20,17 @@ import com.tirsweb.util.gps.GeoDistance;
  * Last updated: October 30, 2003  
  *  
  */   
-    
-    
-    
+      
 /**  
  * Represents an abstraction for a data point in two dimensional space  
  * @author  Manas Somaiya   mhs@cise.ufl.edu  
  */    
+/**
+ * 
+ * 此类描述的是：
+ * @author: dmnrei@gmail.com
+ * @version: 2013-6-3 下午3:30:39
+ */
 public class kMeansPoint {   
     /** Value in dimension x */   
 	// lati

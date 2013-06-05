@@ -71,12 +71,55 @@
 	<table>
 		<tr> 
 			<td>
+				--- 调试模块 ---  
+			</td>
+		</tr>
+		<tr> 
+			<td>
 				<a href="trajectory.jsp">轨迹查询</a>
 			</td>
 		</tr>
+		
+		<tr> 
+			<td>
+				&nbsp; 
+			</td>
+		</tr>
+		
+		<tr> 
+			<td>
+				&nbsp; 
+			</td>
+		</tr>
+		
 		<tr>
 			<td>
-				<a href="routeschedule.jsp">寻找上客点</a>
+				--- 乘客模块 ---
+			</td>
+		</tr>
+		
+		<tr>
+			<td>
+				<a href="finduplocation.jsp">寻找上客点</a>
+			</td>
+		</tr>
+		
+		
+		<tr> 
+			<td>
+				&nbsp; 
+			</td>
+		</tr>
+		
+		<tr> 
+			<td>
+				&nbsp; 
+			</td>
+		</tr>
+		
+		<tr>
+			<td>
+				 --- 出租车模块 ---
 			</td>
 		</tr>
 		<tr>

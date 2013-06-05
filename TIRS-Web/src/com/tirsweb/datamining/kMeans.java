@@ -23,18 +23,24 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import com.tirsweb.dao.jdbc.DAO4;
 import com.tirsweb.dao.jdbc.DAO5;
 import com.tirsweb.model.ParkingLocation;
+import com.tirsweb.util.FileHelper;
 
 /**
- * Implements the k-means algorithm
  * 
- * @author Manas Somaiya mhs@cise.ufl.edu
+ * 此类描述的是：
+ * @author: dmnrei@gmail.com
+ * @version: 2013-6-3 下午3:29:57
  */
 public class kMeans {
 
@@ -42,7 +48,7 @@ public class kMeans {
 	private int k;
 
 	/** Array of clusters */
-	private cluster[] clusters;
+	private Cluster[] clusters;
 
 	/** Number of iterations */
 	private int nIterations;
@@ -64,7 +70,7 @@ public class kMeans {
 	public kMeans(int k, String inputFileName) {
 		this.k = k;
 		this.inputFileName = inputFileName;
-		this.clusters = new cluster[this.k];
+		this.clusters = new Cluster[this.k];
 		this.nIterations = 0;
 		this.kMeansPoints = new Vector();
 
@@ -81,7 +87,7 @@ public class kMeans {
 	public kMeans(int k, List kMeansPoints) {
 		this.k = k;
 		this.inputFileName = inputFileName;
-		this.clusters = new cluster[this.k];
+		this.clusters = new Cluster[this.k];
 		this.nIterations = 0;
 		this.kMeansPoints = new Vector(kMeansPoints);
 
@@ -121,7 +127,7 @@ public class kMeans {
 
 		// Select k points as initial means
 		for (int i = 0; i < k; i++) {
-			this.clusters[i] = new cluster(i);
+			this.clusters[i] = new Cluster(i);
 			this.clusters[i].setMean((kMeansPoint) (this.kMeansPoints
 					.get((int) (Math.random() * this.kMeansPoints.size()))));
 		}
@@ -225,7 +231,7 @@ public class kMeans {
 	     * @return
 	     * @version: May 28, 2013 7:10:49 PM
 	 */
-	public cluster[] getClusters() {
+	public Cluster[] getClusters() {
 		return this.clusters;
 	}
 
@@ -236,7 +242,7 @@ public class kMeans {
 	 *            index of the cluster to be returned
 	 * @return return the specified cluster by index
 	 */
-	public cluster getCluster(int index) {
+	public Cluster getCluster(int index) {
 		return this.clusters[index];
 	} // end of getCluster()
 
@@ -257,6 +263,25 @@ public class kMeans {
 	public Vector getDataPoints() {
 		return this.kMeansPoints;
 	} // end of getDataPoints()
+	
+	
+	public Map<Integer, ClusterInfo> getClusterInfoMap() {
+		Map<Integer, ClusterInfo> clusterInfoMap = new HashMap<Integer, ClusterInfo>();
+		for(int i=0; i<k; i++) {
+			Cluster cluster = this.clusters[i];
+			ClusterInfo clusterInfo = new ClusterInfo(cluster.getClusterNumber(), cluster.getMean().getX(), cluster.getMean().getY());
+// System.out.println("clusterid = " +cluster.getClusterNumber());
+			clusterInfoMap.put(cluster.getClusterNumber(), clusterInfo);
+		}
+		
+		for(int i=0; i<this.kMeansPoints.size(); i++) {
+			kMeansPoint kmPoint = (kMeansPoint)this.kMeansPoints.get(i);
+// System.out.println(kmPoint.getClusterNumber());
+			clusterInfoMap.get(kmPoint.getClusterNumber()).addKMeanPoint(kmPoint);
+		}
+		
+		return clusterInfoMap;
+	}
 
 	/**
 	 * Main method -- to test the kMeans class
@@ -264,50 +289,258 @@ public class kMeans {
 	 * @param args
 	 *            command line arguments
 	 */
-	public static void main(String[] args) {
-/*		kMeansPoint p1 = new kMeansPoint(1, 1);
-		kMeansPoint p2 = new kMeansPoint(1, 2);
-		kMeansPoint p3 = new kMeansPoint(2, 1);
-		kMeansPoint p4 = new kMeansPoint(2, 2);
-		kMeansPoint p5 = new kMeansPoint(1.5, 1.5);
-		kMeansPoint p6 = new kMeansPoint(9, 9);
-		kMeansPoint p7 = new kMeansPoint(9, 10);
-		kMeansPoint p8 = new kMeansPoint(10, 9);
-		kMeansPoint p9 = new kMeansPoint(10, 10);
-		kMeansPoint p10 = new kMeansPoint(9.5, 9.5);
-		List<kMeansPoint> ps = new ArrayList<kMeansPoint>();
-		ps.add(p1);ps.add(p2);ps.add(p3);ps.add(p4);ps.add(p5);ps.add(p6);
-		ps.add(p7);ps.add(p8);ps.add(p9);ps.add(p10);
-*/
+	/*public static void main(String[] args) {
 		DAO5 dao = new DAO5();
-		ArrayList<ParkingLocation> pks = new ArrayList<ParkingLocation>();
-		dao.getParkingLocationByArcId(pks, 57);
-
-		List<kMeansPoint> ps = new ArrayList<kMeansPoint>();
-		for (ParkingLocation parkingLocation : pks) {
-			kMeansPoint p = new kMeansPoint(parkingLocation.getLati(), parkingLocation.getLongi());
-			ps.add(p);
-		}
 		
-		kMeans km = new kMeans(25, ps);
-		/*try {
-			km.readData();
-		} catch (Exception e) {
-			System.err.println(e);
-			System.exit(-1);
-		}*/
-
-		km.runKMeans();
-		cluster[] clusters = km.getClusters();
-		for (cluster cluster : clusters) {
-			System.out.println(cluster.getMean());
+		ArrayList<Integer> arcIdList = new ArrayList<Integer>();
+		
+		arcIdList.add(58);
+		arcIdList.add(90);
+		arcIdList.add(123);
+		arcIdList.add(185);
+		
+		for(int j=0; j<arcIdList.size(); j++) {
+			int arcId = arcIdList.get(j);
+			ArrayList<ParkingLocation> pks = new ArrayList<ParkingLocation>();
+			dao.getParkingLocationByArcId(pks, arcId);
+	
+			List<kMeansPoint> ps = new ArrayList<kMeansPoint>();
+			for (ParkingLocation parkingLocation : pks) {
+				kMeansPoint p = new kMeansPoint(parkingLocation.getLati(), parkingLocation.getLongi());
+				ps.add(p);
+			}
+			
+			if(pks.size() == 0) {
+				//System.out.println("there is no parking location located here");
+				continue;
+			}
+			
+			ArrayList<Double> disList = new ArrayList<Double>();
+			int k = 8;
+			for(int i=1; i<=k; i++) {
+				kMeans km = new kMeans(i, ps);
+				
+				km.runKMeans();
+				Cluster[] clusters = km.getClusters();
+				for (Cluster cluster : clusters) {
+					 // System.out.println(cluster.getMean());
+				}
+				
+				Map<Integer, ClusterInfo> clusterInfoMap = km.getClusterInfoMap();
+				Set<Integer> sets = clusterInfoMap.keySet();
+				double totalDis = 0.0;
+				for (Integer integer : sets) {
+					// System.out.println(clusterInfoMap.get(integer));
+					totalDis += clusterInfoMap.get(integer).getTotalDistance();
+				}
+				// System.out.println("totalDis = " + totalDis);
+				disList.add(totalDis);
+			}
+			
+			String x = "x" + j +" = [";
+			for(int i=1; i<=k; i++) {
+				if(i==k) {
+					x += i;
+				} else{
+					x += (i + ",");
+				}
+			}
+			x += "];";
+			
+			String y = "y" + j + " = [";
+			for(int i=0; i<disList.size(); i++) {
+				if(i == disList.size() - 1) {
+					y += disList.get(i);
+				} else {
+					y += (disList.get(i) + ",");
+				}
+			}
+			y += "];";
+			
+			int number = j+1;
+			int row = 2;
+			int column = 2;
+			
+			// xlabel('x/D');
+		    // ylabel('R(x,x+r)');
+			
+			// System.out.println("arcid = " + arcId);
+			System.out.println("subplot("+row+","+column+","+(number) +");");
+			System.out.println(x);
+			System.out.println(y);
+			System.out.println("p"+j+" = plot(x" + j+ ", y" + j + ");");
+			// set(gca,'FontSize',18);
+		    // set(p,'LineWidth',2);
+			System.out.println("set(gca,'FontSize',10);");
+			System.out.println("set(p"+j+",'LineWidth',2);");
+			System.out.println("xlabel('k')");
+			System.out.println("ylabel('dis(m/s)')");
+			System.out.println("title('ArcId = " + arcId +"');");
+			System.out.println("legend('gps num = " + pks.size() + "');");
+			// clf clear figure in octave
 		}
-		/*System.out.println(km.getCluster(0).getMean());
-		System.out.println(km.getCluster(1).getMean());
-		System.out.println(km.getCluster(2).getMean());
-		System.out.println(km.getCluster(3).getMean());*/
-		//System.out.println(km);
 
 	} // end of main()
+*/
+	
+	/*public static void main(String[] args) {
+		DAO5 dao = new DAO5();
+		
+			int arcId = 185;
+			ArrayList<ParkingLocation> pks = new ArrayList<ParkingLocation>();
+			dao.getParkingLocationByArcId(pks, arcId);
+	
+			List<kMeansPoint> ps = new ArrayList<kMeansPoint>();
+			for (ParkingLocation parkingLocation : pks) {
+				kMeansPoint p = new kMeansPoint(parkingLocation.getLati(), parkingLocation.getLongi());
+				ps.add(p);
+			}
+			
+			if(pks.size() == 0) {
+				//System.out.println("there is no parking location located here");
+				return;
+			}
+			
+			ArrayList<Double> disList = new ArrayList<Double>();
+			int k = 8;
+			for(int i=1; i<=k; i++) {
+				kMeans km = new kMeans(i, ps);
+				
+				km.runKMeans();
+				Cluster[] clusters = km.getClusters();
+				for (Cluster cluster : clusters) {
+					 // System.out.println(cluster.getMean());
+				}
+				
+				Map<Integer, ClusterInfo> clusterInfoMap = km.getClusterInfoMap();
+				Set<Integer> sets = clusterInfoMap.keySet();
+				double totalDis = 0.0;
+				for (Integer integer : sets) {
+					// System.out.println(clusterInfoMap.get(integer));
+					totalDis += clusterInfoMap.get(integer).getTotalDistance();
+				}
+				// System.out.println("totalDis = " + totalDis);
+				disList.add(totalDis);
+			}
+			
+			K kObject = new K(pks.size(), disList);
+			int bestK = kObject.getK();
+			
+			System.out.println("best k = " + bestK);
+			
+			String x = "x = [";
+			for(int i=1; i<=k; i++) {
+				if(i==k) {
+					x += i;
+				} else{
+					x += (i + ",");
+				}
+			}
+			x += "];";
+			
+			String y = "y = [";
+			for(int i=0; i<disList.size(); i++) {
+				if(i == disList.size() - 1) {
+					y += disList.get(i);
+				} else {
+					y += (disList.get(i) + ",");
+				}
+			}
+			y += "];";
+			
+			System.out.println(x);
+			System.out.println(y);
+	}*/
+	
+	public static void main(String[] args) {
+		ArrayList<Integer> arcIdList = new ArrayList<Integer>();
+		DAO5 dao = new DAO5();
+		dao.getArcList(arcIdList);
+		
+		Map<Integer, Integer> arcAndOppositeArcMap;
+		arcAndOppositeArcMap = new HashMap<Integer, Integer>();
+		dao.getArcAndOppositeArcMap(arcAndOppositeArcMap);
+		
+		for(int j=0; j<arcIdList.size(); j++) {
+			int arcId = arcIdList.get(j);
+			
+			System.out.println("arcId = " + arcId);
+			
+			ArrayList<ParkingLocation> pks = new ArrayList<ParkingLocation>();
+			dao.getParkingLocationByArcId(pks, arcId);
+			List<kMeansPoint> ps = new ArrayList<kMeansPoint>();
+			for (ParkingLocation parkingLocation : pks) {
+				kMeansPoint p = new kMeansPoint(parkingLocation.getLati(), parkingLocation.getLongi());
+				ps.add(p);
+			}
+			
+			if(pks.size() == 0) {
+				//System.out.println("there is no parking location located here");
+				continue;
+			}
+			
+			ArrayList<Double> disList = new ArrayList<Double>();
+			int k = 8;
+			for(int i=1; i<=k; i++) {
+				kMeans km = new kMeans(i, ps);
+				km.runKMeans();
+				Cluster[] clusters = km.getClusters();
+				for (Cluster cluster : clusters) {
+					 // System.out.println(cluster.getMean());
+				}
+				
+				Map<Integer, ClusterInfo> clusterInfoMap = km.getClusterInfoMap();
+				Set<Integer> sets = clusterInfoMap.keySet();
+				double totalDis = 0.0;
+				for (Integer integer : sets) {
+					// System.out.println(clusterInfoMap.get(integer));
+					totalDis += clusterInfoMap.get(integer).getTotalDistance();
+				}
+				// System.out.println("totalDis = " + totalDis);
+				disList.add(totalDis);
+			}
+			
+			
+			pks = new ArrayList<ParkingLocation>();
+			dao.getParkingLocationByArcId(pks, arcId);
+			ps = new ArrayList<kMeansPoint>();
+			for (ParkingLocation parkingLocation : pks) {
+				kMeansPoint p = new kMeansPoint(parkingLocation.getLati(), parkingLocation.getLongi());
+				ps.add(p);
+			}
+			
+			K kObject = new K(pks.size(), disList);
+			int bestK = kObject.getK();
+			
+			System.out.println("best k = " + bestK);
+			
+			kMeans km = new kMeans(bestK, ps);
+			km.runKMeans();
+			Cluster[] clusters = km.getClusters();
+			Map<Integer, ClusterInfo> clusterInfoMap = km.getClusterInfoMap();
+			
+			System.out.println("here................");
+			
+			ArrayList<String> sqlList = new ArrayList<String>();
+			for (Cluster cluster : clusters) {
+				String sql = "insert into tb_parking_location_cluster(lati, longi, gpscount, arc_id) values(" + cluster.getMean().getX() + ", " +
+			cluster.getMean().getY() + ", " + clusterInfoMap.get(cluster.getClusterNumber()).getGpsCount() + ", " + arcId + ");";
+				
+				Integer oppositeArcId = arcAndOppositeArcMap.get(arcId);
+				if(oppositeArcId != null) {
+					String sql2 = "insert into tb_parking_location_cluster(lati, longi, gpscount, arc_id) values(" + cluster.getMean().getX() + ", " +
+							cluster.getMean().getY() + ", " + clusterInfoMap.get(cluster.getClusterNumber()).getGpsCount() + ", " + oppositeArcId + ");";
+					sqlList.add(sql2);
+				}
+				
+				sqlList.add(sql);
+				
+			}
+			
+			FileHelper fileHelper = new FileHelper("tb_parking_location_cluster_0530.sql", "append", sqlList);
+			fileHelper.write();
+			fileHelper.close();
+		}
 
+	} // end of main()
 } // end of class

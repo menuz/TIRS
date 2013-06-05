@@ -1,7 +1,6 @@
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-
-import com.tirsweb.model.GPS;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 文件名：Test.java
@@ -12,7 +11,7 @@ import com.tirsweb.model.GPS;
  */
 
 public class Test {
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		GPS gps = new GPS();
 		
 		Class g = gps.getClass();
@@ -38,7 +37,7 @@ public class Test {
 		
 		
 		
-		/*PropertyDescriptor pd;
+		PropertyDescriptor pd;
 		try {
 		pd = new PropertyDescriptor(field[i].getName(),clazz);
 		Method getMethod = pd.getReadMethod();
@@ -53,7 +52,40 @@ public class Test {
 		}
 		} catch (Exception e) {
 		e.printStackTrace();
-		}*/
+		}
+	}*/
+	
+	public static void main(String[] args) {
+		Set<Integer> sets = new HashSet<Integer>();
+		
+		ArrayList<Integer> lists = new ArrayList<Integer>();
+		lists.add(1);
+		lists.add(2);
+		lists.add(3);
+		
+		sets.addAll(lists);
+		
+		for (Integer integer : sets) {
+			// System.out.println(integer);
+		}
+		
+		
+		lists = new ArrayList<Integer>();
+		lists.add(3);
+		lists.add(4);
+		lists.add(5);
+		
+		sets.addAll(lists);
+		
+		for (Integer integer : sets) {
+			System.out.println(integer);
+		}
+		
+		lists = null;
+		
+		sets.addAll(lists);
+		
+		
 	}
 }
 

@@ -6,7 +6,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
-import com.tirsweb.datamining.cluster;
+import com.tirsweb.datamining.Cluster;
 import com.tirsweb.datamining.kMeans;
 import com.tirsweb.datamining.kMeansPoint;
 import com.tirsweb.model.Point;
@@ -53,9 +53,9 @@ public class ClusterXML2 {
 			element.addAttribute("clusterindex", (i+1)+"");
 		}
 		
-		cluster[] cs = kmeans.getClusters();
+		Cluster[] cs = kmeans.getClusters();
 		for (i=0; i < cs.length; i++) {
-			cluster c = cs[i];
+			Cluster c = cs[i];
 			
 			Element element = body.addElement("cluster");
 			element.addAttribute("id", (i+1)+"");

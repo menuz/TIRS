@@ -21,6 +21,7 @@ import com.tirsweb.dao.jdbc.DAO5;
 import com.tirsweb.datamining.kMeans;
 import com.tirsweb.datamining.kMeansPoint;
 import com.tirsweb.model.Arc;
+import com.tirsweb.model.Node;
 import com.tirsweb.model.NodePoint;
 import com.tirsweb.model.ParkingLocation;
 import com.tirsweb.model.Point;
@@ -59,7 +60,8 @@ public class PublicXMLFeed extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setCharacterEncoding("GBK");
-		response.setContentType("text/xml");     
+		response.setContentType("text/xml");    
+		response.setCharacterEncoding("GBK");
 		 
 		String query_string = request.getQueryString();
 		
@@ -76,14 +78,16 @@ public class PublicXMLFeed extends HttpServlet {
 		
 		if(cmd.equals(APIVar.TRAJECTORY)) 
 		{
-			String time1 =  new String(request.getParameter("time1").getBytes("ISO-8859-1"), "utf-8");
-			String time2 =  new String(request.getParameter("time2").getBytes("ISO-8859-1"), "utf-8");
+			String time1 = new String(request.getParameter("time1").getBytes("ISO-8859-1"), "utf-8");
+			String time2 = new String(request.getParameter("time2").getBytes("ISO-8859-1"), "utf-8");
 			out.println(apiHandler.trajectory(keyValueArr.get("vehicle_id"), keyValueArr.get("v_num"), 
 					time1, time2));   
 		}
 		
 		else if(cmd.equals(APIVar.FINDUPLOCATION)) {
-			out.println("to be implement");
+			String time = new String(request.getParameter("time").getBytes("ISO-8859-1"), "utf-8");
+			out.println(apiHandler.finduplocation(keyValueArr.get("lati"), keyValueArr.get("longi"), 
+					time));
 		}
 		
 		else if(cmd.equals(APIVar.FINDPASSENGER)) 
@@ -99,7 +103,8 @@ public class PublicXMLFeed extends HttpServlet {
 		}
 		
 		else if ("line".equalsIgnoreCase(cmd)) {
-			 String content = new String(request.getParameter("content").getBytes("ISO-8859-1"), "utf-8");
+			String content = new String(request.getParameter("content")
+					.getBytes("ISO-8859-1"), "utf-8");
 System.out.println("content = " + content);
 			 // get trip from tb_trip to display on the map
 			 // freetrip+tripid+vehicleid+rownum
@@ -120,6 +125,10 @@ System.out.println("content = " + content);
              // arcdetail use to display arc's detail indeed
 			 // arcdetail+arcid 
              // arcdetail+1
+
+			 // route display node list composed of a route
+			 // route+routeSeq
+			 // route+1->2->3
 			 String[] strs = content.split("[+]");		    
 			 for (String string : strs) {
 				System.out.println(string);
@@ -189,6 +198,24 @@ System.out.println("1 = " + strs[1] + " 2 = " + strs[2] + " 3 = " + strs[3]);
 			 else if(strs[0].equals("box")) {
 				 points = dao.getCorrespondingArcListByBoxId(strs[1]);
 			 }
+			 
+			 // len1 correct
+			 // 1->2->3->4->5->19->20->34->35->36->37->38->39->25->26->27->28
+			 
+			 // len2 wrong
+			 // 1->2->3->4->5->6->7->8->9->10->11->25->39->40->41->42->28
+			 
+			 // len3 correct
+			 // 1->2->3->4->5->19->20->34->35->36->37->38->39->25->26->27->28
+			 else if(strs[0].equals("route")) {
+				 String[] nodeList = strs[1].split("->");
+				 points = new ArrayList<NodePoint>();
+				 for(String nodeId : nodeList) {
+					 Node node = getCache().queryNodeByNodeId(nodeId);
+					 NodePoint np = new NodePoint(node.getId(), node.getLati(), node.getLongi());
+					 points.add(np);
+				 }
+			 }
 
              Document document = DocumentHelper.createDocument();
              Element body = document.addElement("body");
@@ -226,7 +253,7 @@ System.out.println("1 = " + strs[1] + " 2 = " + strs[2] + " 3 = " + strs[3]);
                     	 point.addAttribute("id", strs[1]);
                       }
                      
-                     if(strs[0].equals("box")) {
+                     if(strs[0].equals("box") || strs[0].equals("route") || strs[0].equals("nodelist")) {
                     	 point.addAttribute("id", points.get(i).getId()+"");
                       }
                      
@@ -255,7 +282,7 @@ System.out.println("1 = " + strs[1] + " 2 = " + strs[2] + " 3 = " + strs[3]);
 						lon_correct = p.getLon();
 					}
                      
-					point.addAttribute("id", strs[1]);
+					 point.addAttribute("id", strs[1]);
                      point.addAttribute("latitude",String.valueOf(lat));
                      point.addAttribute("longitude",String.valueOf(lon));
                      point.addAttribute("latitude_correct",String.valueOf(lat_correct));
@@ -372,10 +399,17 @@ System.out.println("1 = " + strs[1] + " 2 = " + strs[2] + " 3 = " + strs[3]);
 		// cluster used for display clustering algorithm result
 		// return point type: parking place in arc and the cluster point in arc
 		else if ("cluster".equalsIgnoreCase(cmd)) {
+			String content = new String(request.getParameter("content").getBytes("ISO-8859-1"), "utf-8");
+			String[] temp = content.split("[+]");
+			
 			DAO5 dao = new DAO5();
 			ArrayList<ParkingLocation> pks = new ArrayList<ParkingLocation>();
-			//87 57 
-			dao.getParkingLocationByArcId(pks, 123);
+			//58-62 
+			
+			String arcid = temp[0];
+			String clusterK = temp[1];
+			int k = Integer.parseInt(clusterK);
+			dao.getParkingLocationByArcId(pks, temp[0]);
 			
 			List<kMeansPoint> ps = new ArrayList<kMeansPoint>();
 			for (ParkingLocation parkingLocation : pks) {
@@ -385,9 +419,8 @@ System.out.println("1 = " + strs[1] + " 2 = " + strs[2] + " 3 = " + strs[3]);
 			
 			if(ps == null || ps.size() == 0) {
 				out.println("no point in the arc");  
-			} else {
-				int k = (int)Math.sqrt(ps.size());
-				kMeans km = new kMeans(4, ps);
+			} else {  
+				kMeans km = new kMeans(k, ps);  
   
 				km.runKMeans();
 
@@ -399,7 +432,6 @@ System.out.println("1 = " + strs[1] + " 2 = " + strs[2] + " 3 = " + strs[3]);
 			System.out.println(km.getCluster(2).getMean());
 			System.out.println(km.getCluster(3).getMean());*/
 	     }
-		
 	}
 
 	/**

@@ -9,6 +9,8 @@ package com.tirsweb.datamining;
 
 import java.util.ArrayList;
 
+import com.tirsweb.util.gps.GeoDistance;
+
 public class Test {
 	/*public static void main(String[] args) {
 		Time t1 = Time.valueOf("16:13:02");
@@ -27,7 +29,7 @@ public class Test {
 		System.out.println(Math.abs((tt2-tt1)/1000));
 	}*/
 	
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		ArrayList<Integer> arcList = new ArrayList<Integer>();
 		arcList.add(3);
 		arcList.add(3);
@@ -69,7 +71,7 @@ public class Test {
 		if(arcId != -2 && arcId != -1) {
 			System.out.println(startIdx + "  " + (arcList.size()-1) + "  " + arcId);
 		}
-	}
+	}*/
 	
 	/*public static void main(String[] args) {
 		String arcAndAverageSpeed = "4+20.9";
@@ -101,6 +103,17 @@ public class Test {
 			System.out.println("1!=1");
 		}
 	}*/
+	
+	
+	public static void main(String[] args) {
+		double lat1 = 30.282788;
+		double lng1 = 120.081875;
+		double lat2 = 30.289234;
+		double lng2 = 120.080856;
+		double dis = GeoDistance.computeCompareDistance(lat1, lng1, lat2, lng2);
+		System.out.println(dis);
+	}
+	
 }
 
 

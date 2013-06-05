@@ -15,6 +15,12 @@ import com.tirsweb.dao.jdbc.DAO2;
 import com.tirsweb.model.Node;
 import com.tirsweb.model.NodePoint;
 
+/**
+ * 
+ * 此类描述的是：用于生成道路网络信息
+ * @author: dmnrei@gmail.com
+ * @version: 2013-6-3 上午8:44:03
+ */
 public class MapInfo {
 	public static void main(String[] args) {
 		DAO2 dao = new DAO2();

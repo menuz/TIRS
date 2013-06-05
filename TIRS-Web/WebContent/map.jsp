@@ -10,6 +10,7 @@
 </script>
 
 <script src="js/jquery-1.8.3.js"></script>
+<script src="js/infobox.js"></script>
 
 <script type="text/javascript">
 	var map;
@@ -189,14 +190,14 @@
 			if (gps.state == 1) {
 				marker = new google.maps.Marker({
 					position : p,
-					title : '#',
+					title : '#' + gps.message_id,
 					map : map,
 					icon : 'image/red.png'
 				});
 			} else {
 				marker = new google.maps.Marker({
 					position : p,
-					title : '#',
+					title : '#' + gps.message_id,
 					map : map,
 					icon : 'image/green.png'
 				});
@@ -248,13 +249,13 @@
 								gpses = new Array(); 
 								
 								for ( var i = 0; i < vehicles.length; i++) {
-									
+									id = vehicles[i].getAttribute("id");
 									longi = vehicles[i].getAttribute("longitude");
 									lati = vehicles[i].getAttribute("latitude");
 									longi_correct = vehicles[i].getAttribute("longitude_correct");
 									lati_correct = vehicles[i].getAttribute("latitude_correct");
 
-									var gps = new GPS(null, null,
+									var gps = new GPS(id, null,
 											null, longi, lati,
 											longi_correct, lati_correct, null,
 											null, null, null, 1,
@@ -385,14 +386,14 @@
 							xmldoc = parser.parseFromString(xmlText,
 									"text/xml");
 						}
-						ps_route(xmldoc);
+						fp_query_response(xmldoc);
 					}
 				}
 			}
 		});
 	}
 	
-	function ps_route(xmldoc) {
+	function fp_query_response(xmldoc) {
 		clear();
 		var startpoint = xmldoc
 		.getElementsByTagName("startpoint");
@@ -437,6 +438,178 @@
 		});
 	}
 	
+	/* ----------------------------------------- finduplocation -------------------------------------*/
+	function fu_query(lati, longi, time) {
+		jQuery
+		.ajax({
+			url : "PublicXMLFeed",
+			data : {
+				command : "finduplocation", 
+				lati : lati,
+				longi : longi,
+				time : time + ""
+			},
+			complete : function(xhr, textStatus) {
+				if (xhr.readyState == 4) {
+					if (xhr.status == 200 || xhr.status == 304) {
+						var xmlText = xhr.responseText;
+						if (window.ActiveXObject) {
+							xmldoc = new ActiveXObject(
+									"Microsoft.XMLDOM");
+							xmldoc.async = "false";
+							xmldoc.loadXML(xmlText);
+						} else {
+							parser = new DOMParser();
+							xmldoc = parser.parseFromString(xmlText,
+									"text/xml");
+						}
+						fu_query_response(xmldoc);
+					}
+				}
+			}
+		});
+	}
+	
+	function fu_query_response(xmldoc) {
+		clearStartAndEnd();
+		clear();
+		var startpoint = xmldoc
+		.getElementsByTagName("startpoint");
+		var clusterpoint = xmldoc
+		.getElementsByTagName("clusterpoint");
+		var endpoint = xmldoc
+		.getElementsByTagName("endpoint");
+		
+		var ori = new google.maps.LatLng(
+				startpoint[0].getAttribute("lati"), 
+				startpoint[0].getAttribute("longi"));
+		var dest = new google.maps.LatLng(
+				endpoint[0].getAttribute("lati"), 
+				endpoint[0].getAttribute("longi"));
+
+		// start
+		marker = new google.maps.Marker({
+			icon: 'image/passenger.png',
+			position: ori,
+			map: map,
+			title:'乘客位置'
+		});
+		
+		setLabel(ori, '乘客位置');
+		
+		// parking location
+		for ( var i = 0; i < clusterpoint.length; i++) {
+			lati = clusterpoint[i].getAttribute("lati");
+			longi = clusterpoint[i].getAttribute("longi");
+			nearestidx = clusterpoint[i].getAttribute("nearestidx");
+			gpscount = clusterpoint[i].getAttribute("gpscount");
+
+			latLng = new google.maps.LatLng(lati, longi);
+			
+			marker = new google.maps.Marker({
+				icon: 'image/parkinglocation.png',
+				position: latLng,
+				map: map,
+				title:nearestidx + '.' + '聚簇个数：' + gpscount 
+			});
+			
+			marker.setMap(map);
+			setLabel(latLng, nearestidx + '.' + '聚簇个数：' + gpscount);
+		}
+		
+		// end
+		marker = new google.maps.Marker({
+			icon: 'image/parkinglocation.png',
+			position: dest,
+			map: map,
+			title:'上客点'
+		});
+		setLabel(dest, '上客点');
+		
+		directionsService = new google.maps.DirectionsService();
+		directionsDisplay = new google.maps.DirectionsRenderer();
+		directionsDisplay.setMap(map);
+
+		var request = {
+		            origin: ori,
+		            destination: dest,
+		            travelMode: google.maps.TravelMode['WALKING']
+		};
+		
+		directionsService.route(request, function(response, status) {
+	          if (status == google.maps.DirectionsStatus.OK) {
+	            	directionsDisplay.setDirections(response);
+	          } else { 
+	           	    alert("Directions Request Failed, "+status);
+	          }
+		});
+	}
+	
+	
+	function fu_query2(lati1, longi1, lati2, longi2,  time) {
+		jQuery
+		.ajax({
+			url : "PublicXMLFeed",
+			data : {
+				command : "finduplocation", 
+				lati : lati,
+				longi : longi,
+				time : time + ""
+			},
+			complete : function(xhr, textStatus) {
+				if (xhr.readyState == 4) {
+					if (xhr.status == 200 || xhr.status == 304) {
+						var xmlText = xhr.responseText;
+						if (window.ActiveXObject) {
+							xmldoc = new ActiveXObject(
+									"Microsoft.XMLDOM");
+							xmldoc.async = "false";
+							xmldoc.loadXML(xmlText);
+						} else {
+							parser = new DOMParser();
+							xmldoc = parser.parseFromString(xmlText,
+									"text/xml");
+						}
+						fu_query2_response(xmldoc);
+					}
+				}
+			}
+		});
+	}
+	
+	function fu_query2_response(xmldoc) {
+		clear();
+		var startpoint = xmldoc
+		.getElementsByTagName("startpoint");
+		var endpoint = xmldoc
+		.getElementsByTagName("endpoint");
+		
+		directionsService = new google.maps.DirectionsService();
+		directionsDisplay = new google.maps.DirectionsRenderer();
+		directionsDisplay.setMap(map);
+
+		var ori = new google.maps.LatLng(
+				startpoint[0].getAttribute("lati"), 
+				startpoint[0].getAttribute("longi"));
+		var dest = new google.maps.LatLng(
+				endpoint[0].getAttribute("lati"), 
+				endpoint[0].getAttribute("longi"));
+
+		var request = {
+		            origin: ori,
+		            destination: dest,
+		            travelMode: google.maps.TravelMode['WALKING']
+		};
+		
+		directionsService.route(request, function(response, status) {
+	          if (status == google.maps.DirectionsStatus.OK) {
+	            	directionsDisplay.setDirections(response);
+	          } else { 
+	           	    alert("Directions Request Failed, "+status);
+	          }
+		});
+	}
+	
 	function fp_draw() {
 		clear();
 		directionsService = new google.maps.DirectionsService();
@@ -470,6 +643,9 @@
 		          }
 		});
 	}
+	
+	
+	
 	
 /* ------------------------------------------------- route schedule --------------------*/
 var $O,$M,$L;
@@ -514,10 +690,30 @@ var end;
 var endMarker = null;
 var cur;
 
+function clearStartAndEnd() {
+	if(startMarker != null) {
+		startMarker.setMap(null);
+		startMarker = null;
+	}
+	
+	if(endMarker != null) {
+		endMarker.setMap(null);
+		endMarker = null;
+	}
+}
+
 function setStartPoint() {
 	start = cur;
 	if(startMarker != null) startMarker.setMap(null);
-	startMarker = $M.mark(map, cur, "Start");
+	
+	startMarker = new google.maps.Marker({
+		position : start,
+		title : '起点',
+		map : map,
+		icon : 'image/start.png'
+	});
+	
+	startMarker.setMap(map);
 	
 	self.parent.frames["tree"].setStartPoint(cur);
 }
@@ -525,7 +721,15 @@ function setStartPoint() {
 function setEndPoint() {
 	end = cur;
 	if(endMarker != null) endMarker.setMap(null);
-	endMarker = $M.mark(map, cur, "End");
+	
+	endMarker = new google.maps.Marker({
+		position : end,
+		title : '终点',
+		map : map,
+		icon : 'image/end.png'
+	});
+	
+	endMarker.setMap(map);
 	
 	self.parent.frames["tree"].setEndPoint(cur);
 }
@@ -661,7 +865,10 @@ function arc_node_play() {
 
 function setWindow(lati, longi, content) {
 /* 	alert("content" + content);
- */	infowindow = new google.maps.InfoWindow();
+ */	infowindow = new google.maps.InfoWindow({
+	 maxWidth: 5
+ 	}
+	);
 	infowindow.setContent(content);
 	g = new google.maps.LatLng(lati, longi);
 	marker = new google.maps.Marker({
@@ -670,8 +877,35 @@ function setWindow(lati, longi, content) {
 		map : map,
 		icon : 'image/red.png'
 	});
+	
 	infowindow.open(map, marker);
 }
+
+
+function setLabel(pos, labelText) {
+
+	var myOptions = {
+		 content: labelText
+		,boxStyle: {
+		   border: "1px solid black"
+		  ,textAlign: "center"
+		  ,fontSize: "8pt"
+		  ,width: "100px"
+		 }
+		,disableAutoPan: true
+		,pixelOffset: new google.maps.Size(-25, 0)
+		,position: pos
+		,closeBoxURL: ""
+		,isHidden: false
+		,pane: "mapPane"
+		,enableEventPropagation: true
+	};
+
+	var ibLabel = new InfoBox(myOptions);
+	ibLabel.open(map);
+}
+
+
 
 function arc_node(id, start_node_id, end_node_id, lati1, longi1, lati2, longi2) {
 	 var infowindow1 = new google.maps.InfoWindow();
@@ -822,12 +1056,13 @@ function arc_query() {
 
 
 /*-------------------------------------------------- cluster ----------------------------------------------*/ 
- function cluster() {
+ function cluster(clustercontent) {
 		jQuery
 		.ajax({
 			url : "PublicXMLFeed",
 			data : {
-				command : "cluster"
+				command : "cluster",
+				content : clustercontent 
 			},
 			complete : function(xhr, textStatus) {
 				if (xhr.readyState == 4) {
@@ -1129,6 +1364,71 @@ function arcdetail(arcid) {
 			}
 		});
 	}
+	
+/*-------------------------------------------------- route ----------------------------------------------*/
+function route(routeSeq) {
+	jQuery
+	.ajax({
+		url : "PublicXMLFeed",
+		data : {
+			command : "line",
+			content : "route+"+routeSeq
+		},
+		complete : function(xhr, textStatus) {
+			if (xhr.readyState == 4) {
+				if (xhr.status == 200 || xhr.status == 304) {
+					var xmlText = xhr.responseText;
+					if (window.ActiveXObject) {
+						xmldoc = new ActiveXObject(
+								"Microsoft.XMLDOM");
+						xmldoc.async = "false";
+						xmldoc.loadXML(xmlText);
+					} else {
+						parser = new DOMParser();
+						xmldoc = parser.parseFromString(xmlText,
+								"text/xml");
+					}
+
+					var mapType = map.getMapTypeId();
+					var pointlist = xmldoc
+							.getElementsByTagName("point");
+
+					var polyOptions = {
+							strokeColor : '#000000',
+							strokeOpacity : 1.0,
+							strokeWeight : 3
+						}
+					
+					poly = new google.maps.Polyline(polyOptions);
+					poly.setMap(map);
+					var path = poly.getPath();
+					for ( var i = 0; i < pointlist.length; i=i+1) {
+						id = pointlist[i].getAttribute("id");
+						lati = pointlist[i].getAttribute("latitude_correct");							
+						longi = pointlist[i].getAttribute("longitude_correct");
+						
+						if(i == 0 || i == pointlist.length -1 ) {
+							setWindow(lati, longi, 'Arc ' + id);
+						}
+						
+						p = new google.maps.LatLng(lati, longi);
+						
+						marker = new google.maps.Marker({
+							position : p,
+							title : '#',
+							map : map,
+							icon : 'image/red.png'
+						});
+						marker.setMap(map);
+						
+						path.push(p);
+					}
+				}
+			}
+		}
+	});
+}
+	
 </script>
 
 </head>

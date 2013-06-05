@@ -104,7 +104,7 @@ public class DAO extends DataSourceDAO {
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(sql);
 			while (rs.next()) {
-				NodePoint point = new NodePoint(rs.getDouble("lati"),
+				NodePoint point = new NodePoint(rs.getInt("id"), rs.getDouble("lati"),
 						rs.getDouble("longi"));
 				points.add(point);
 			}

@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 import com.tirsweb.model.GPS;
+import com.tirsweb.model.ParkingLocationCluster;
 
 /**
  * 
@@ -48,5 +49,19 @@ System.out.println("db time = " + db_time);*/
 				note);
 
 		return gps;
+	}
+	
+	
+	public static ParkingLocationCluster loadParkingLocationCluster(java.sql.ResultSet rs) throws SQLException {
+		double lati = rs.getDouble("lati");
+		double longi = rs.getDouble("longi");
+		
+		int gpscount = rs.getInt("gpscount");
+		int arcid = rs.getInt("arc_id");
+		int id = rs.getInt("id");
+
+		ParkingLocationCluster pkCluster = new ParkingLocationCluster(id, lati, longi, gpscount, arcid);
+
+		return pkCluster;
 	}
 }
