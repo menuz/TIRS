@@ -44,26 +44,26 @@ public class MapInfo {
 			
 			if(l >=1 && l <=56) {
 				if(i%14 != 1) {
-					node.getChild().put(new Node(l), -1);
+					node.getChild().put(new Node(l), -1.0);
 				}
 			}
 			
 			if(r >=1 && r <=56) {
 				if(i%14 != 0) {
-					node.getChild().put(new Node(r), -1);
+					node.getChild().put(new Node(r), -1.0);
 				}
 			}
 			
 			if(u >=1 && u <=56) {
-				node.getChild().put(new Node(u), -1);
+				node.getChild().put(new Node(u), -1.0);
 			}
 			
 			if(d >=1 && d <=56) {
-				node.getChild().put(new Node(d), -1);
+				node.getChild().put(new Node(d), -1.0);
 			}
 			
 			if(i == 43) {
-				node.getChild().put(new Node(57), -1);
+				node.getChild().put(new Node(57), -1.0);
 			}
 			
 			allNode.add(node);
@@ -80,18 +80,18 @@ public class MapInfo {
 			node.setLongi(longi);
 			
 			if(i == 57) {
-				node.getChild().put(new Node(43), -1);
-				node.getChild().put(new Node(58), -1);
-				node.getChild().put(new Node(65), -1);
+				node.getChild().put(new Node(43), -1.0);
+				node.getChild().put(new Node(58), -1.0);
+				node.getChild().put(new Node(65), -1.0);
 			} else if (i==58) {
-				node.getChild().put(new Node(57), -1);
-				node.getChild().put(new Node(59), -1);
-				node.getChild().put(new Node(66), -1);
+				node.getChild().put(new Node(57), -1.0);
+				node.getChild().put(new Node(59), -1.0);
+				node.getChild().put(new Node(66), -1.0);
 			} else if(i == 64) {
-				node.getChild().put(new Node(63), -1);
+				node.getChild().put(new Node(63), -1.0);
 			} else {
-				node.getChild().put(new Node(i+1), -1);
-				node.getChild().put(new Node(i-1), -1);
+				node.getChild().put(new Node(i+1), -1.0);
+				node.getChild().put(new Node(i-1), -1.0);
 			}
 			
 			allNode.add(node);
@@ -108,12 +108,12 @@ public class MapInfo {
 			node.setLongi(longi);
 			
 			if(i == 65) {
-				node.getChild().put(new Node(57), -1);
-				node.getChild().put(new Node(66), -1);
+				node.getChild().put(new Node(57), -1.0);
+				node.getChild().put(new Node(66), -1.0);
 			} else if(i == 66) {
-				node.getChild().put(new Node(65), -1);
-				node.getChild().put(new Node(58), -1);
-				node.getChild().put(new Node(60), -1);
+				node.getChild().put(new Node(65), -1.0);
+				node.getChild().put(new Node(58), -1.0);
+				node.getChild().put(new Node(60), -1.0);
 			}
 			
 			allNode.add(node);
@@ -129,7 +129,7 @@ public class MapInfo {
 		int i=1;
 		for (Node node : allNode) {
 			
-			Map<Node, Integer> child = node.getChild();
+			Map<Node, Double> child = node.getChild();
 			Set<Node> set = child.keySet();
 			for (Node node2 : set) {
 				String sql = "insert into tb_arc values(" + i + ", " + node.getId() + ", " + node2.getId() + ", 0);";

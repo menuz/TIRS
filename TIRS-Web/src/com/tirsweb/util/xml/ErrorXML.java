@@ -26,6 +26,11 @@ public class ErrorXML {
 	public static int ARCPARKINGLOCATIONCLUSTERERROR = 4;
 	public static int CLUSTERNOTFOUND = 5;
 	
+	/**
+	 * route schedule
+	 */
+	public static int ARCNOTFOUND = 6; 
+	
 	private Document document;
 	private Element body;
 
@@ -52,6 +57,9 @@ public class ErrorXML {
 		} else if(type == CLUSTERNOTFOUND) {
 			element.addAttribute("erorrtype", type + "");
 			element.addAttribute("msg", "该街道不存在聚簇点");
+		} else if(type == ARCNOTFOUND) {
+			element.addAttribute("erorrtype", "routeschedule " + type + " ");
+			element.addAttribute("msg", "找不到就近的Arc");
 		}
 		
 		return document.asXML();

@@ -1,6 +1,8 @@
 package com.tirsweb.model;
 
 public class Speed {
+	private int id;
+	private int arcId;
 	private int boxId;
 	private int weekday;
 	private int hour;
@@ -8,7 +10,17 @@ public class Speed {
 	private double speed;
 	
 	public Speed() {}
-	
+
+	public Speed(int id, int arcId, int weekday, int hour,
+			double speed) {
+		super();
+		this.id = id;
+		this.arcId = arcId;
+		this.weekday = weekday;
+		this.hour = hour;
+		this.speed = speed;
+	}
+
 	public Speed(int boxId, int weekday, int hour, double speed) {
 		super();
 		this.boxId = boxId;
@@ -17,12 +29,12 @@ public class Speed {
 		this.speed = speed;
 	}
 
-	public static String getKey(int boxId, int weekday, int hour) {
-		return "" + boxId + weekday + hour;
+	public static String getKey(int arcId, int weekday, int hour) {
+		return "" + arcId + weekday + hour;
 	}
 	
 	public String getKey() {
-		return "" + boxId + weekday + hour;
+		return "" + arcId + weekday + hour;
 	}
 	
 	public double getSpeed() {
@@ -55,5 +67,22 @@ public class Speed {
 
 	public void setSpeed(double speed) {
 		this.speed = speed;
+	}
+	
+	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public int getArcId() {
+		return arcId;
+	}
+
+	public void setArcId(int arcId) {
+		this.arcId = arcId;
 	}
 }

@@ -60,6 +60,38 @@ public class FileHelper {
 		}
 
 	}
+	
+	public FileHelper(String filename, String mode) {
+		this.filename = filename;
+		this.mode = mode;
+
+		File f = new File(filename);
+		if (!f.exists()) {
+			try {
+				f.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		try {
+			write = null;
+			try {
+				if (mode.equals("override")) {
+					write = new FileWriter(f, false);
+				} else if (mode.equals("append")) {
+					write = new FileWriter(f, true);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			bufferedWriter = new BufferedWriter(write);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
 
 	public void write() {
 		for (String sql : sqlList) {
@@ -69,6 +101,16 @@ public class FileHelper {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+		close();
+	}
+	
+	public void write(String str) {
+		try {
+			bufferedWriter.write(str + "\n");
+			bufferedWriter.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		close();
 	}

@@ -31,7 +31,7 @@ public class Node {
 	}
 	
 	// child  Integer is distance of two nodes
-	private Map<Node,Integer> child=new HashMap<Node,Integer>();
+	private Map<Node,Double> child=new HashMap<Node,Double>();
 	// refresh by time
 	private long lastAccessTime;
 	
@@ -45,10 +45,10 @@ public class Node {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public Map<Node, Integer> getChild() {
+	public Map<Node, Double> getChild() {
 		return child;
 	}
-	public void setChild(Map<Node, Integer> child) {
+	public void setChild(Map<Node, Double> child) {
 		this.child = child;
 	}
 	

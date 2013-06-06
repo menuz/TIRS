@@ -68,7 +68,7 @@ public class RouteDAO extends JDBCDAO{
 				int start_node_id = rs.getInt("start_node_id");
 				int end_node_id = rs.getInt("end_node_id");
 				int len = rs.getInt("len2");
-				nodes[start_node_id].getChild().put(nodes[end_node_id], len);
+				nodes[start_node_id].getChild().put(nodes[end_node_id], (double)len);
 	        }
 		} catch (SQLException e) {
 			e.printStackTrace();

@@ -16,6 +16,7 @@ import java.util.Set;
 import com.tirsweb.dao.jdbc.DAO4;
 import com.tirsweb.model.Arc;
 import com.tirsweb.model.ArcDetail;
+import com.tirsweb.model.BaseArc;
 import com.tirsweb.model.Box;
 import com.tirsweb.model.Node;
 import com.tirsweb.model.Point;
@@ -265,7 +266,7 @@ public class CopyOfTripToSegmentList {
 			count++;
 			
 			Arc arc = arcs.get(arcList.get(i));
-			Arc oppositeArc = arcs.get(arcAndOppositeArcMap.get(arcList.get(i)));
+			BaseArc oppositeArc = arcs.get(arcAndOppositeArcMap.get(arcList.get(i)));
 			Node start = nodes.get(arc.getStart_node_id());
 			Node end = nodes.get(arc.getEnd_node_id());
 			double _angle = angle.angle(p1.getLat(), p1.getLon(), p2.getLat(), p2.getLon(), 

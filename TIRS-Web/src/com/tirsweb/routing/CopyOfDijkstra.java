@@ -4,7 +4,7 @@
  * 版本信息： version 1.0
  * 日期：2013-6-3
  * Copyright by menuz
- */
+ *//*
 package com.tirsweb.routing;
 
 import java.util.HashMap;
@@ -91,9 +91,9 @@ public class CopyOfDijkstra {
 		}
 	}
 	
-	/**
+	*//**
 	 * 获取与node最近的子节点
-	 */
+	 *//*
 	private Node getShortestPath(Node node){
 		Node res=null;
 		int minDis=Integer.MAX_VALUE;
@@ -123,3 +123,4 @@ public class CopyOfDijkstra {
 	}
 }
 
+*/

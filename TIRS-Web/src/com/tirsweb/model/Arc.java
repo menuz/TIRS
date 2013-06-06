@@ -10,12 +10,7 @@ package com.tirsweb.model;
 import java.util.ArrayList;
 
 
-public class Arc {
-	public int id;
-	
-	public int start_node_id;
-	public int end_node_id;
-	
+public class Arc extends BaseArc {
 	public double lati1;
 	public double longi1;
 	public double lati2;

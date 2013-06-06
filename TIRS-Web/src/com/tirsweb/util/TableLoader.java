@@ -7,12 +7,13 @@
  */
 package com.tirsweb.util;
 
-import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
+import com.tirsweb.model.BaseArc;
 import com.tirsweb.model.GPS;
 import com.tirsweb.model.ParkingLocationCluster;
+import com.tirsweb.model.Speed;
 
 /**
  * 
@@ -64,4 +65,30 @@ System.out.println("db time = " + db_time);*/
 
 		return pkCluster;
 	}
+	
+	public static Speed loadSpeed(java.sql.ResultSet rs) throws SQLException {
+		double lati = rs.getDouble("lati");
+		double longi = rs.getDouble("longi");
+		
+		int arcid = rs.getInt("arc_id");
+		int id = rs.getInt("id");
+		int weekday = rs.getInt("weekday");
+		int hourofday = rs.getInt("hourofday");
+		double speed = rs.getDouble("speed");
+
+		Speed s = new Speed(id,arcid,weekday,hourofday, speed);
+
+		return s;
+	}
+	
+	public static BaseArc loadBaseArc(java.sql.ResultSet rs) throws SQLException {
+		int id = rs.getInt("id");
+		int start_node_id = rs.getInt("start_node_id");
+		int end_node_id = rs.getInt("end_node_id");
+		int len = rs.getInt("len");
+
+		BaseArc arc = new BaseArc(id, start_node_id, end_node_id, len);
+		return arc;
+	}
+	
 }

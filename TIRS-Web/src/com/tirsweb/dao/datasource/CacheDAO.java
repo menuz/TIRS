@@ -10,6 +10,7 @@ import java.util.Map;
 import com.tirsweb.dao.DataSourceDAO;
 import com.tirsweb.model.Arc;
 import com.tirsweb.model.ArcDetail;
+import com.tirsweb.model.BaseArc;
 import com.tirsweb.model.Node;
 import com.tirsweb.model.ParkingLocationCluster;
 import com.tirsweb.model.Point;
@@ -28,6 +29,35 @@ public class CacheDAO extends DataSourceDAO {
 	
     public CacheDAO() {
        super();
+    }
+    
+    /**
+     * 
+    	 * 此方法描述的是：加在tb_arc_speed_avg中的时间.....
+         * @param speeds
+         * @param sql
+         * @author: dmnrei@gmail.com
+         * @version: 2013-6-6 下午6:39:05
+     */
+    public void loadSpeed(Map<String, Speed> speeds, String sql) {
+    	Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		
+        try {
+	    	conn = getConn();
+	    	stmt = conn.prepareStatement(sql);
+	    	rs = stmt.executeQuery(sql);
+	    	
+			while (rs.next()) {
+				Speed spd = TableLoader.loadSpeed(rs);
+				speeds.put(spd.getKey(), spd);
+	        }
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+            releaseSource(conn, stmt, rs);
+		}
     }
     
     /**
@@ -52,7 +82,7 @@ public class CacheDAO extends DataSourceDAO {
 				int start_node_id = rs.getInt("start_node_id");
 				int end_node_id = rs.getInt("end_node_id");
 				int len = rs.getInt("len2");
-				nodes[start_node_id].getChild().put(nodes[end_node_id], len);
+				nodes[start_node_id].getChild().put(nodes[end_node_id], (double)len);
 	        }
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -251,6 +281,27 @@ System.out.println("offsetlat = " + offsetlat + " offsetlon = " + offsetlon);
         }
     }
     
+    public void queryAllArcList(ArrayList<BaseArc> arcList) {
+    	Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		
+		String sql = "select * from tb_arc order by id asc";
+        try {
+	    	conn = getConn();
+	    	stmt = conn.prepareStatement(sql);
+	    	rs = stmt.executeQuery(sql);
+	    	
+			while (rs.next()) {
+				
+	        }
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+            releaseSource(conn, stmt, rs);
+		}
+    }
+    
     public void initStartAndEndNodeMapArc(Map<Integer, Arc> arcs, Map<String, Arc> startAndEndNodeMapArc) {
     	Connection conn = null;
 		Statement stmt = null;
@@ -265,7 +316,7 @@ System.out.println("offsetlat = " + offsetlat + " offsetlon = " + offsetlon);
 	    	
 			int arcid = -1;
 			//ArrayList<Arc> arcList = new ArrayList<Arc>();
-			Arc arc = null;
+			BaseArc arc = null;
 			ArrayList<ArcDetail> arcDetailList = null;
 			while (rs.next()) {
 				int arc_id = rs.getInt("id");

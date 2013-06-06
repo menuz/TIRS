@@ -17,6 +17,7 @@ import java.util.Set;
 
 import com.tirsweb.model.Arc;
 import com.tirsweb.model.ArcDetail;
+import com.tirsweb.model.BaseArc;
 import com.tirsweb.model.Box;
 import com.tirsweb.model.ParkingLocation;
 import com.tirsweb.model.Point;
@@ -41,7 +42,7 @@ public class CopyOfGPSToArc {
 		Set<Integer> keys = arcs.keySet();
 		// System.out.println("key size = " + keys.size());
 		for (Integer integer : keys) {
-			Arc arc = arcs.get(integer);
+			BaseArc arc = arcs.get(integer);
 		}
 		
 		// load arc box mapping

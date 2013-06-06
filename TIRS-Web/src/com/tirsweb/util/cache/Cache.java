@@ -1,9 +1,5 @@
 package com.tirsweb.util.cache;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,41 +10,66 @@ import java.util.Set;
 
 import com.tirsweb.dao.datasource.CacheDAO;
 import com.tirsweb.model.Arc;
+import com.tirsweb.model.BaseArc;
 import com.tirsweb.model.Node;
 import com.tirsweb.model.ParkingLocationCluster;
 import com.tirsweb.model.Point;
 import com.tirsweb.model.Speed;
 import com.tirsweb.model.Up;
+import com.tirsweb.routing.MapBuilder;
+import com.tirsweb.util.cache.thread.SpeedManager;
 
 public class Cache {
+	/**
+	 * load at once, so we can define map capacity, and prevent rehash cost
+	 * default load factor 0.75
+	 */
+	private int ARCNUMBER = 211;
+	private int	NODENUMBER = 66;
+	private double loadfactor = 0.75; 
+	
 	private Map<String, Point> offsets;
-	private Map<String, Speed> speeds;
 	private Map<String, Up> ups;
 	private Map<Integer, Arc> arcs;
+	private ArrayList<BaseArc> arcList;
 	private Map<Integer, Node> nodes;
 	
 	// 
 	private Map<Integer, ArrayList<Integer>> boxAndArcMap;
-	// 
+	
+	// 路段停靠点map 
 	private Map<Integer, ArrayList<ParkingLocationCluster>> pkClusterListMap;
+	
+	// 路段速度map
+	private Map<String, Speed> speeds;
+	
 	// 
 	private Map<Integer, Integer> arcAndOppositeArcMap;
 	
 	//
 	private Map<String, Arc> startAndEndNodeMapArc;
 	
+	private MapBuilder mapBuilder;
+	
 	
 	private CacheDAO cacheDAO;
 	
 	public Cache() {
-		offsets = new HashMap<String, Point>();
-		speeds = new HashMap<String, Speed>();
-		ups = new HashMap<String, Up>();
+		offsets = new HashMap<String, Point>(128);
+		speeds = new HashMap<String, Speed>(512);
 		
-		arcs = new HashMap<Integer, Arc>();
-		startAndEndNodeMapArc = new HashMap<String, Arc>();
+		/**
+		 * load speed at init function
+		 */
+		SpeedManager speedManager = new SpeedManager(speeds);
+		Thread t = new Thread(speedManager);
+		t.start();
 		
-		nodes = new HashMap<Integer, Node>();
+		arcs = new HashMap<Integer, Arc>((int)(ARCNUMBER/loadfactor));
+		arcList = new ArrayList<BaseArc>();
+		startAndEndNodeMapArc = new HashMap<String, Arc>((int)(ARCNUMBER/loadfactor));
+		
+		nodes = new HashMap<Integer, Node>((int)(NODENUMBER/loadfactor));
 		
 		cacheDAO = new CacheDAO();
 		
@@ -58,6 +79,7 @@ public class Cache {
 		
 		// 加在arc相关信息,包括arcdetail等信息
 		initArc();
+		initArcList();
 		initStartAndEndNodeMapArc();
 		// 加在节点信息
 		initNode();
@@ -66,10 +88,17 @@ public class Cache {
 		pkClusterListMap = new HashMap<Integer, ArrayList<ParkingLocationCluster>>();
 		// 
 		arcAndOppositeArcMap = new HashMap<Integer, Integer>();
+		
+		//
+		mapBuilder = new MapBuilder(this);
 	}
 	
 	public void initArc() {
 		cacheDAO.queryAllArc(arcs);
+	}
+	
+	public void initArcList() {
+		cacheDAO.queryAllArcList(arcList);
 	}
 	
 	public void initStartAndEndNodeMapArc() {
@@ -84,7 +113,6 @@ public class Cache {
 		cacheDAO.queryAllBoxAndArcMap(boxAndArcMap);
 	}
 	
-
 	public Point gpsToMarGPS(double latitude, double longitude) {
 		DecimalFormat df = new DecimalFormat("###.00");
 		String df_lat = df.format(latitude);
@@ -134,6 +162,15 @@ System.out.println("@Cache.gpsToMarGPS 超过纠偏范围");
 	}
 	
 	// queryMethod is public
+	public Speed querySpeedWithKey(String key) {
+		return speeds.get(key);
+	}
+	
+	
+	public ArrayList<BaseArc> queryAllBaseArc() {
+		return arcList;
+	}
+	
 	public Map<Integer, Integer> queryArcAndOppositeMap() {
 		if(arcAndOppositeArcMap.size() == 0) {
 			cacheDAO.getArcAndOppositeArcMap(arcAndOppositeArcMap);
@@ -274,6 +311,12 @@ System.out.println("boxid, weekday, hour " + boxid + weekday + hour + " not exis
 		return speedList;
 	}
 	
+	/* Dijkstra Map Routing Part */
+	public Node[] getNodeArray() {
+		return mapBuilder.getNodeArray();
+	}
+	
+
 	// getUnloadMethod invoke CacheDAO to get data from db
 	private List<Speed> getUnLoadSpeedListByKeys(ArrayList<Integer> boxList, int weekday, int hour) {
 		return cacheDAO.querySpeedListByKeys(boxList, weekday, hour);

@@ -918,7 +918,6 @@ function rs_query_response(xmldoc) {
 	setLabel(dest, 'Ä¿µÄµØ');
 }
 
-
 function rs_query_google(lati1, longi1, lati2, longi2, time) {
 	directionsService = new google.maps.DirectionsService();
 	directionsDisplay = new google.maps.DirectionsRenderer();

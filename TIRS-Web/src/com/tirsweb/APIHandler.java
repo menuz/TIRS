@@ -318,7 +318,7 @@ System.out.println("lati " + latitude + " longi " + longitude + " uploadTime " +
 		int endNodeId = startAndEndNode.get(1);
 		
 		// Step4  use kmeans to build up route between startnode and endnode
-		ArrayList<Integer> pathList = new Dijkstra().findShortestPath(startNodeId, endNodeId);
+		ArrayList<Integer> pathList = new Dijkstra(cache).findShortestPath(startNodeId, endNodeId);
 		
 		// Step5  return points
 		// start point
@@ -369,6 +369,10 @@ System.out.println("lati " + latitude + " longi " + longitude + " uploadTime " +
 		// 前往的停靠点
 		// real gps to map gps
 		int arcid2 = ArcUtil.GpsToArcId(cache, pe.getLat(), pe.getLon());
+		
+		if(arcid1 == -1 || arcid2 == -1) {
+			return new ErrorXML().errorType(ErrorXML.ARCNOTFOUND);  
+		}
 
 		ArrayList<Integer> startAndEndNode = ArcUtil.calStartNodeAndEndNode(
 				cache, arcid1, arcid2);
@@ -377,7 +381,7 @@ System.out.println("lati " + latitude + " longi " + longitude + " uploadTime " +
 		int endNodeId = startAndEndNode.get(1);
 
 		// Step4 use kmeans to build up route between startnode and endnode
-		Dijkstra routing = new Dijkstra();
+		Dijkstra routing = new Dijkstra(cache);
 		ArrayList<Integer> pathList = routing.findShortestPath(startNodeId, endNodeId);
 
 		// Step5 return points
