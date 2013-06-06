@@ -116,8 +116,6 @@ public class ArcUtil {
 					if (dis < minDisBetPkAndCurrentArc) {
 						minDisBetPkAndCurrentArc = dis;
 					}
-
-					// System.out.print(dis + "  " );
 				}
 
 				if (minDisBetPkAndCurrentArc < minDis) {
@@ -163,6 +161,14 @@ public class ArcUtil {
 			int arcid2) {
 		Arc arc1 = cache.queryArcByArcId(arcid1);
 		Arc arc2 = cache.queryArcByArcId(arcid2);
+		
+		if(arcid1 == -1 ||
+				arcid2 == -1 ||
+					arc1 == null ||
+						arc2 == null) {
+System.err.println("hahahaha");
+			return null;
+		}
 
 		Node node1_start = cache.queryNodeByNodeId(arc1.getStart_node_id());
 		Node node1_end = cache.queryNodeByNodeId(arc1.getEnd_node_id());
@@ -179,7 +185,7 @@ public class ArcUtil {
 		list.add(dis1); list.add(dis2); list.add(dis3); list.add(dis4);
 		double minDis = Double.MAX_VALUE;
 		int idx = -1;
-		for(int i=0; i<=list.size(); i++) {
+		for(int i=0; i<list.size(); i++) {
 			if(list.get(i) < minDis) {
 				minDis = list.get(i);
 				idx = i;

@@ -266,48 +266,41 @@ System.out.println("lati " + latitude + " longi " + longitude + " uploadTime " +
 		}
 		
 		// Step2  get potential parking location same as API-finduplocation
-
 		double lati2 = 0;
 		double longi2 = 0;
 		
-		// object list for xml displaying
-		// ArrayList<XMLParkingLocationCluster> xmlObjectList = new ArrayList<XMLParkingLocationCluster>();
+		// iterate all arcList, and find the maximum cluster point
+		double maxCount = Double.MIN_VALUE;
+		int maxCountIdx = -1;
+		int maxCountIdxIdx = -1;
 		for(int i=0; i<arcDisList.size(); i++) {
-			if(i==3) break;
-			
 			// get clustered parking location by arcid
 			ArrayList<ParkingLocationCluster> plClusterList = cache.queryParkingLocationCluserListByArcId(arcDisList.get(i).getArcid());
 			if(plClusterList == null) {
 				continue;
 			}
 			
-			// change to xml format
-			/*for (ParkingLocationCluster plc : plClusterList) {
-				XMLParkingLocationCluster xmlObject = new XMLParkingLocationCluster(plc.getId(), plc.getLati(), plc.getLongi(), 
-						plc.getGpsCount(), plc.getArcId(), i+1);
-				xmlObjectList.add(xmlObject);
-			}*/
-			
-			// get the nearest arc and get the hottest spot in this arc
-			if(i==0) {
-				int idx = -1;
-				int maxClusterNum = Integer.MIN_VALUE;
-				double minDis = Double.MAX_VALUE;
+				// get the nearest arc and get the hottest spot in this arc
 				for(int j=0; j<plClusterList.size(); j++) {
 					ParkingLocationCluster plCluster = plClusterList.get(j);
 					Point pTemp = cache.gpsToMarGPS(plCluster.getLati(), plCluster.getLongi());
 					double dis = GeoDistance.computeCompareDistance(lati, longi, plCluster.getLati(), plCluster.getLongi());
-					  
-					if(dis < minDis) {
-						minDis = dis;
-						idx = j;
+					int gpscount = plCluster.getGpsCount();
+					
+					int count = plCluster.getGpsCount();
+					
+					if(count > maxCount) {
+						maxCount = count;
+						maxCountIdx = i;
+						maxCountIdxIdx = j;
 					}
 				}
-				
-				lati2 = plClusterList.get(idx).getLati();
-				longi2 = plClusterList.get(idx).getLongi();
-			}
 		}
+		
+		ParkingLocationCluster plCluster = cache.queryParkingLocationCluserListByArcId(arcDisList.get(maxCountIdx).getArcid()).get(maxCountIdxIdx);
+		lati2 = plCluster.getLati();
+		longi2 = plCluster.getLongi();
+		int arcid2 = arcDisList.get(maxCountIdx).getArcid();
 		
 		// Step3  get the neigboring node as startnode and endnode 
 		// 出租车起点
@@ -317,7 +310,7 @@ System.out.println("lati " + latitude + " longi " + longitude + " uploadTime " +
 		
 		// 前往的停靠点
 		// real gps to map gps
-		int arcid2 = ArcUtil.GpsToArcId(cache, lati2, longi2);
+		arcid2 = arcid2;
 		
 		ArrayList<Integer> startAndEndNode = ArcUtil.calStartNodeAndEndNode(cache, arcid1, arcid2);
 		
@@ -354,17 +347,28 @@ System.out.println("lati " + latitude + " longi " + longitude + " uploadTime " +
 		return findPassengerXML.toString();
 	}
 	
+	public String routeschedule(String latiS,String longiS, String latiE, String longiE, String uploadTime) {
+		return routeschedule(Double.parseDouble(latiS), Double.parseDouble(longiS), Double.parseDouble(latiE), 
+				Double.parseDouble(longiE), uploadTime);
+	}
+	
 	public String routeschedule(double latiS,double longiS, double latiE, double longiE, String uploadTime) {
+		System.out.println(latiS + "  " + longiS);
+		System.out.println(latiE + "  " + longiE);
+		
 		// Step3 get the neigboring node as startnode and endnode
 		Point ps = cache.marGpsToGps(latiS, longiS);
 		Point pe = cache.marGpsToGps(latiE, longiE);
+		
+		System.out.println(ps.getLat() + "  " + ps.getLon());
+		System.out.println(pe.getLat() + "  " + pe.getLon());
 		
 		// 出租车起点
 		int arcid1 = ArcUtil.GpsToArcId(cache, ps.getLat(), ps.getLon());
 
 		// 前往的停靠点
 		// real gps to map gps
-		int arcid2 = ArcUtil.GpsToArcId(cache, pe.getLat(), ps.getLon());
+		int arcid2 = ArcUtil.GpsToArcId(cache, pe.getLat(), pe.getLon());
 
 		ArrayList<Integer> startAndEndNode = ArcUtil.calStartNodeAndEndNode(
 				cache, arcid1, arcid2);
@@ -373,8 +377,8 @@ System.out.println("lati " + latitude + " longi " + longitude + " uploadTime " +
 		int endNodeId = startAndEndNode.get(1);
 
 		// Step4 use kmeans to build up route between startnode and endnode
-		ArrayList<Integer> pathList = new Dijkstra().findShortestPath(
-				startNodeId, endNodeId);
+		Dijkstra routing = new Dijkstra();
+		ArrayList<Integer> pathList = routing.findShortestPath(startNodeId, endNodeId);
 
 		// Step5 return points
 		// start point

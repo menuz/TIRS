@@ -95,8 +95,29 @@ function rs_query() {
 	var longi2 = $O("longitude2").value;
 	var lati2 = $O("latitude2").value;
 	
-	self.parent.frames["map"].rs_query(lati1, longi1, lati2, longi2, time);
+	if(lati1 == 30.0 || lati2 == 30.0) {
+		alert("请设置起点或终点");
+	} else {
+		self.parent.frames["map"].rs_query(lati1, longi1, lati2, longi2, time);
+	}
 }
+
+function rs_query_google() {
+	var now = new Date();
+	var time = dateFormat(now, "yyyy-mm-dd HH:MM:ss");
+	var longi1 = $O("longitude1").value;
+	var lati1 = $O("latitude1").value;
+	
+	var longi2 = $O("longitude2").value;
+	var lati2 = $O("latitude2").value;
+	
+	if(lati1 == 30.0 || lati2 == 30.0) {
+		alert("请设置起点或终点");
+	} else {
+		self.parent.frames["map"].rs_query_google(lati1, longi1, lati2, longi2, time);
+	}
+}
+
 
 function setStartPoint(cur) {
 	$O("latitude1").value = cur.lat();
@@ -145,8 +166,9 @@ function setEndPoint(cur) {
 			<td>纬度</td>
 			<td><input type="text" id="latitude2" name="latitude" value="30.0" size="10"></td>
 		</tr>
-	</table>
-	<input type="button" value="手气不错" onclick="rs_query()" class="btn" />
+	</table><br/>
+	<input type="button" value="Tirs" onclick="rs_query()" class="btn" />   <input type="button" value="Google" onclick="rs_query_google()" class="btn" />
+	
 </body>
 
 </html>

@@ -394,11 +394,69 @@
 	}
 	
 	function fp_query_response(xmldoc) {
+		clearStartAndEnd();
+		clear();
+		var startpoint = xmldoc
+		.getElementsByTagName("startpoint");
+		var intervalpoint = xmldoc
+		.getElementsByTagName("intervalpoint");
+		var endpoint = xmldoc
+		.getElementsByTagName("endpoint");
+		
+		var polyOptions = {
+				strokeColor : '#000000',
+				strokeOpacity : 1.0,
+				strokeWeight : 3
+			}
+		poly = new google.maps.Polyline(polyOptions);
+		poly.setMap(map);
+		var path = poly.getPath();
+
+		var ori = new google.maps.LatLng(
+				startpoint[0].getAttribute("lati"), 
+				startpoint[0].getAttribute("longi"));
+		path.push(ori);
+		
+		marker = new google.maps.Marker({
+			icon: 'image/taxi.png',
+			position: ori,
+			map: map,
+			title:'出租车位置'
+		});
+		
+		setLabel(ori, '出租车位置');
+		
+
+		for ( var i = 0; i < intervalpoint.length; i++) {
+			lati = intervalpoint[i].getAttribute("lati").toString();
+			longi = intervalpoint[i].getAttribute("longi").toString();
+			latlng = new google.maps.LatLng(lati, longi);
+			path.push(latlng);
+		}
+		
+		
+		var dest = new google.maps.LatLng(
+				endpoint[0].getAttribute("lati"), 
+				endpoint[0].getAttribute("longi"));
+		path.push(dest);
+		
+		marker = new google.maps.Marker({
+			icon: 'image/parkinglocation.png',
+			position: dest,
+			map: map,
+			title:'停靠点位置'
+		});
+		
+		setLabel(ori, '停靠点位置');
+	}
+	
+	
+	function fp_query_response_back(xmldoc) {
 		clear();
 		var startpoint = xmldoc
 		.getElementsByTagName("startpoint");
 		var waypoints = xmldoc
-		.getElementsByTagName("waypoint");
+		.getElementsByTagName("intervalpoint");
 		var endpoint = xmldoc
 		.getElementsByTagName("endpoint");
 		
@@ -483,6 +541,7 @@
 		var ori = new google.maps.LatLng(
 				startpoint[0].getAttribute("lati"), 
 				startpoint[0].getAttribute("longi"));
+		
 		var dest = new google.maps.LatLng(
 				endpoint[0].getAttribute("lati"), 
 				endpoint[0].getAttribute("longi"));
@@ -774,7 +833,93 @@ function createContextMenu(controlUI,map) {
 }
 
 function rs_query(lati1, longi1, lati2, longi2, time) {
+	jQuery
+	.ajax({
+		url : "PublicXMLFeed",
+		data : {
+			command : "routeschedule", 
+			lati1 : lati1,
+			longi1 : longi1,
+			lati2 : lati2,
+			longi2 : longi2,
+			time : time + ""
+		},
+		complete : function(xhr, textStatus) {
+			if (xhr.readyState == 4) {
+				if (xhr.status == 200 || xhr.status == 304) {
+					var xmlText = xhr.responseText;
+					if (window.ActiveXObject) {
+						xmldoc = new ActiveXObject(
+								"Microsoft.XMLDOM");
+						xmldoc.async = "false";
+						xmldoc.loadXML(xmlText);
+					} else {
+						parser = new DOMParser();
+						xmldoc = parser.parseFromString(xmlText,
+								"text/xml");
+					}
+					rs_query_response(xmldoc);
+				}
+			}
+		}
+	});
+}
+
+function rs_query_response(xmldoc) {
+	clearStartAndEnd();
 	clear();
+	var startpoint = xmldoc
+	.getElementsByTagName("startpoint");
+	var intervalpoint = xmldoc
+	.getElementsByTagName("intervalpoint");
+	var endpoint = xmldoc
+	.getElementsByTagName("endpoint");
+	
+	var polyOptions = {
+			strokeColor : '#000000',
+			strokeOpacity : 1.0,
+			strokeWeight : 3
+		}
+	poly = new google.maps.Polyline(polyOptions);
+	poly.setMap(map);
+	var path = poly.getPath();
+
+	var ori = new google.maps.LatLng(
+			startpoint[0].getAttribute("lati"), 
+			startpoint[0].getAttribute("longi"));
+	path.push(ori);
+	
+	marker = new google.maps.Marker({
+		icon: 'image/taxi.png',
+		position: ori,
+		map: map,
+		title:'出发地'
+	});
+	setLabel(ori, '出发地');
+
+	for ( var i = 0; i < intervalpoint.length; i++) {
+		lati = intervalpoint[i].getAttribute("lati").toString();
+		longi = intervalpoint[i].getAttribute("longi").toString();
+		latlng = new google.maps.LatLng(lati, longi);
+		path.push(latlng);
+	}
+	
+	var dest = new google.maps.LatLng(
+			endpoint[0].getAttribute("lati"), 
+			endpoint[0].getAttribute("longi"));
+	path.push(dest);
+	
+	marker = new google.maps.Marker({
+		icon: 'image/taxi.png',
+		position: dest,
+		map: map,
+		title:'目的地'
+	});
+	setLabel(dest, '目的地');
+}
+
+
+function rs_query_google(lati1, longi1, lati2, longi2, time) {
 	directionsService = new google.maps.DirectionsService();
 	directionsDisplay = new google.maps.DirectionsRenderer();
 	directionsDisplay.setMap(map);
@@ -792,7 +937,7 @@ function rs_query(lati1, longi1, lati2, longi2, time) {
 	          if (status == google.maps.DirectionsStatus.OK) {
 	              directionsDisplay.setDirections(response);
 	              
-	              routes = response.routes;
+	              /*routes = response.routes;
 	              alert("route size = " + routes.length);
 	              
 	              gpsList = routes[0].overview_path;
@@ -800,13 +945,14 @@ function rs_query(lati1, longi1, lati2, longi2, time) {
 	              
 	              for(var i in gpsList) {
 	            	  $M.mark(map, gpsList[i], gpsList[i].lat()+","+gpsList[i].lng());
-	              }
+	              }*/
 	              
 	          } else { 
 	              alert("Directions Request Failed, "+status);
 	          }
 	});
 }
+
 
 /*---------------------------------- extract arc detail ---------------------------*/
 var idx = 0;

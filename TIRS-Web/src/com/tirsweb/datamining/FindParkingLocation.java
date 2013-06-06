@@ -32,11 +32,11 @@ public class FindParkingLocation {
 	public int timeThreshold = 200;
 	ArrayList<ParkingLocation> returnPointList;
 
-	public int timeInterval(Point p1, Point p2) {
+	/*public int timeInterval(Point p1, Point p2) {
 		Time time1 = p1.getTime();
 		Time time2 = p2.getTime();
 		return 50;
-	}
+	}*/
 
 	public int timeInterval(int idx1, int idx2) {
 		return Math.abs(20 * (idx2 - idx1));

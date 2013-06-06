@@ -87,7 +87,7 @@ public class FindUpLocationUtil {
 			disList.add(minDisToArc);
 		}
 		
-		
+		// sort by the minDis small->big
 		ArrayList<ArcDis> lists = new ArrayList<ArcDis>();
 		for(int i=0; i<disList.size(); i++) {
 			ArcDis arcDis = new ArcDis(arcList.get(i), disList.get(i));

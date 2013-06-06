@@ -99,7 +99,9 @@ public class PublicXMLFeed extends HttpServlet {
 		
 		else if(cmd.equals(APIVar.ROUTESCHEDULE)) 
 		{
-			out.println("");
+			String time = new String(request.getParameter("time").getBytes("ISO-8859-1"), "utf-8");
+			out.println(apiHandler.routeschedule(keyValueArr.get("lati1"),keyValueArr.get("longi1"), 
+					keyValueArr.get("lati2"), keyValueArr.get("longi2"), time));
 		}
 		
 		else if ("line".equalsIgnoreCase(cmd)) {
