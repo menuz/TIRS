@@ -447,7 +447,7 @@
 			title:'停靠点位置'
 		});
 		
-		setLabel(ori, '停靠点位置');
+		setLabel(dest, '停靠点位置');
 	}
 	
 	

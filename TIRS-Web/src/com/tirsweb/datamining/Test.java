@@ -106,13 +106,22 @@ public class Test {
 	
 	
 	public static void main(String[] args) {
-		double lat1 = 30.282788;
+	/*	double lat1 = 30.282788;
 		double lng1 = 120.081875;
 		double lat2 = 30.289234;
 		double lng2 = 120.080856;
 		double dis = GeoDistance.computeCompareDistance(lat1, lng1, lat2, lng2);
-		System.out.println(dis);
+		System.out.println(dis);*/
+		
+		StringBuffer sb = new StringBuffer(4012);
+		for(int i=1; i<=4000; i++) {
+			sb.append("s");
+		}
+		
+		System.out.println("sb = " + sb.toString());
+		
 	}
+	
 	
 }
 

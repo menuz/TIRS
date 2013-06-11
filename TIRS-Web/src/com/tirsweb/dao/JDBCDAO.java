@@ -56,7 +56,6 @@ public class JDBCDAO extends BaseDAO{
 		try {
 			conn = DriverManager.getConnection(url, user, password);
 			if (conn!= null && !conn.isClosed());
-				// System.out.println("Succeeded connecting to the Database!");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

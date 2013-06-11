@@ -20,6 +20,7 @@ import com.tirsweb.dao.JDBCDAO;
 import com.tirsweb.model.Arc;
 import com.tirsweb.model.ArcDetail;
 import com.tirsweb.model.ParkingLocation;
+import com.tirsweb.model.TbArcSpeed;
 import com.tirsweb.model.Trip;
 
 /**
@@ -28,7 +29,7 @@ import com.tirsweb.model.Trip;
  * @author: dmnrei@gmail.com
  * @version: May 17, 2013 12:35:07 PM
  */
-public class ArcToBoxDAO {
+public class TripToSegmentListDAO {
 	
 	 /** Oracle数据库连接URL*/
     private final static String url = "jdbc:oracle:thin:@192.168.1.111:1521:tirs1";
@@ -56,7 +57,7 @@ public class ArcToBoxDAO {
 	/**
 	 * 
 	 */
-	public ArcToBoxDAO() {
+	public TripToSegmentListDAO() {
 		try {
 			Class.forName(driver);
 		} catch (Exception e) {
@@ -78,6 +79,40 @@ public class ArcToBoxDAO {
 		}
 		return conn;
 	}
+	
+	
+	 public ArrayList<Trip> queryTripWithRange(int startIdx, int endIdx) {
+	    	Connection conn = null;
+			Statement stmt = null;
+			ResultSet rs = null;
+			
+			ArrayList<Trip> trips = new ArrayList<Trip>();
+			
+			String sql = "select * from tb_gps_1112_trip where id between " + startIdx + " and " + endIdx;
+	        try {
+		    	conn = getConn();
+		    	stmt = conn.prepareStatement(sql);
+		    	rs = stmt.executeQuery(sql);
+				
+				while (rs.next()) {
+					int id = rs.getInt("id");
+					String trip_id = rs.getString("trip_id");
+					String vehicle_id = rs.getString("vehicle_id");
+					Clob clob = rs.getClob("note");
+	            	String note = new String(clob.getSubString((long)1, (int)clob.length()));
+	            	String state = rs.getString("state");
+	            	Trip trip = new Trip(id, trip_id, vehicle_id, note, state);
+
+	            	trips.add(trip);
+		        }
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+//	            releaseSource(conn, stmt, rs);
+	        }
+	        
+	        return trips;
+	    }
 	
 	
 	 public ArrayList<Trip> getFreeTrip(int startIdx, int endIdx) {
@@ -111,22 +146,22 @@ public class ArcToBoxDAO {
 	    }
 	 
 	 
-	 public void insertParkingLocation(ArrayList<ParkingLocation> points) {
+	 public void insertArcSpeed(ArrayList<TbArcSpeed> arcSpeedList) {
 		    Connection conn = null;
 	        PreparedStatement pstmt = null;
 	        ResultSet rs = null;
 		 
-	        String sql = "insert into tb_parking_location(trip_id, vehicle_id, lati, longi, arc_id) values(?,?,?,?,-1)";
+	        String sql = "insert into tb_arc_speed_copy(arc_id, weekday, hourofday, speed) values(?,?,?,?)";
 		    try {
 		    	conn = getConn();
 				conn.setAutoCommit(false);
 				pstmt = conn.prepareStatement(sql);
-				for(int i = 0; i<points.size(); i++) {
-					ParkingLocation pl = points.get(i);
-					pstmt.setString(1, pl.getTripId());
-					pstmt.setString(2, pl.getVehicleId());
-					pstmt.setDouble(3, pl.getLati());
-					pstmt.setDouble(4, pl.getLongi());
+				for(int i = 0; i<arcSpeedList.size(); i++) {
+					TbArcSpeed pl = arcSpeedList.get(i);
+					pstmt.setInt(1, pl.getArc_id());
+					pstmt.setInt(2, pl.getWeekday());
+					pstmt.setInt(3, pl.getHourofday());
+					pstmt.setDouble(4, pl.getSpeed());
 				    pstmt.addBatch();
 				}
 				pstmt.executeBatch();
@@ -194,7 +229,7 @@ public class ArcToBoxDAO {
 	 }
 	 
 	 public static void main(String[] args) {
-		 ArcToBoxDAO dao = new ArcToBoxDAO();
+		 TripToSegmentListDAO dao = new TripToSegmentListDAO();
 		 ArrayList<Arc>  arcs = dao.queryArcList();
 		 int i=0; 
 		 for (Arc arc : arcs) {

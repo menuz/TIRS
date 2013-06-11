@@ -7,8 +7,8 @@
  */
 package com.tirsweb.datamining;
 
-import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -166,16 +166,34 @@ public class FindParkingLocation {
 	}
 	
 	public static void main(String[] args) {
-		ArcToBoxDAO dao = new ArcToBoxDAO();
-		String rownum = "99999999";
-		ArrayList<Trip> trips = dao.getFreeTrip(rownum);
+		long begin = new Date().getTime();
 		
-		FindParkingLocation fp = new FindParkingLocation();
-		for (Trip trip : trips) {
-			fp.dosomething(trip);
-			ArrayList<ParkingLocation> points = fp.getParkingPoints();
-			System.out.println("size = " + points.size());
-			dao.insertParkingLocation(points);
+		ArrayList<Integer> idxs = new ArrayList<Integer>();
+		for(int i=1; i <= 826218; i+=10000) {
+			idxs.add(i);
 		}
+		idxs.add(826218);
+		
+		int threadId = 1;
+		for(int i=0; i<idxs.size()-1; i++) {
+			if(i==0) {
+				FindParkingLocationThread thread = new FindParkingLocationThread(threadId, idxs.get(i), idxs.get(i+1));
+				thread.start();
+			} else {
+				FindParkingLocationThread thread = new FindParkingLocationThread(threadId, idxs.get(i)+1, idxs.get(i+1));
+				thread.start();
+			}
+			threadId ++;
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		long end = new Date().getTime();
+		int seconds = (int)((end - begin) / 1000);
+		
+		System.out.println("cost time = " + seconds);
 	}
 }
