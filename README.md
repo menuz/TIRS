@@ -1,15 +1,20 @@
 TIRS
 Taxi Intelligent Recommender System
 
-Ubuntu12.04 Server X64 + Hadoop1.0.4 + JDK7 + Sqoop1.4.3
+JDK7
+Ubuntu12.04 Server X64 
+Oracle 11g
+Sqoop1.4.3
+Hadoop1.0.4 
 
-0) Setup Hadoop Cluster
 
-1) Sqoop transfer Taxi GPS Data From Oracle to HDFS
+Project Description:
+All i got is raw gps trajectories from my tutor, then i use google map api to 
+grab a part of hangzhou road network. 211 roads, 66 nodes covring wenyi road,
+wener road, wensan road, tianmushan road and liuxia road.
 
+1) raw gps trajectories mines to parking locations and average speed of roads.
+    
+2) use mining result and road network to construct route info with Dijkstra Algorithm.
 
------------------------------------------------------------------
------------------------------------------------------------------
-
-2) Instead of Mapper/Reducer, i use hive for taxi dataset mining, TIRS Project keep some Mapper/Reducer demo, TIRS-Web Project is a web project for displaying mining result.
 
