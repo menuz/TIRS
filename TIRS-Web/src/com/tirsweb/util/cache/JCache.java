@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.tirsweb.dao.jdbc.JCacheDAO;
+import com.tirsweb.dao.JCacheDAO;
 import com.tirsweb.model.Arc;
 import com.tirsweb.model.ParkingLocation;
 import com.tirsweb.model.Point;

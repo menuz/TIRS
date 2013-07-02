@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.tirsweb.dao.datasource.CacheDAO;
+import com.tirsweb.dao.CacheDAO;
 import com.tirsweb.model.Arc;
 import com.tirsweb.model.BaseArc;
 import com.tirsweb.model.Node;

@@ -16,10 +16,10 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
-import com.tirsweb.dao.datasource.DAO;
-import com.tirsweb.dao.jdbc.DAO5;
-import com.tirsweb.datamining.kMeans;
-import com.tirsweb.datamining.kMeansPoint;
+import com.tirsweb.dao.APIDAO;
+import com.tirsweb.dao.JCacheDAO;
+import com.tirsweb.datamining.cluster.kMeans;
+import com.tirsweb.datamining.cluster.kMeansPoint;
 import com.tirsweb.model.Arc;
 import com.tirsweb.model.Node;
 import com.tirsweb.model.NodePoint;
@@ -137,7 +137,7 @@ System.out.println("content = " + content);
 			}
 			
 			 ArrayList<NodePoint> points = null;
-			 DAO dao = new DAO();
+			 APIDAO dao = new APIDAO();
 			 if(strs[0].equals("freetrip")) {
 
 System.out.println("1 = " + strs[1] + " 2 = " + strs[2] + " 3 = " + strs[3]);
@@ -296,7 +296,7 @@ System.out.println("1 = " + strs[1] + " 2 = " + strs[2] + " 3 = " + strs[3]);
 		
 		// Arc_Query
 		else if ("arc".equalsIgnoreCase(cmd)) {
-			DAO dao = new DAO();
+			APIDAO dao = new APIDAO();
             
             ArrayList<Arc> points = dao.getarcbyid();
 
@@ -352,7 +352,7 @@ System.out.println("1 = " + strs[1] + " 2 = " + strs[2] + " 3 = " + strs[3]);
 			String[] latArray = latStr.split(",");
 			String[] lonArray = lonStr.split(",");
 			
-			DAO dao = new DAO();
+			APIDAO dao = new APIDAO();
 			
 			for(int i=0; i<latArray.length; i++){
 				dao.insertArcDetail(Integer.parseInt(arcid), 
@@ -404,7 +404,7 @@ System.out.println("1 = " + strs[1] + " 2 = " + strs[2] + " 3 = " + strs[3]);
 			String content = new String(request.getParameter("content").getBytes("ISO-8859-1"), "utf-8");
 			String[] temp = content.split("[+]");
 			
-			DAO5 dao = new DAO5();
+			JCacheDAO dao = new JCacheDAO();
 			ArrayList<ParkingLocation> pks = new ArrayList<ParkingLocation>();
 			//58-62 
 			

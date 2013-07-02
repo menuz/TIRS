@@ -6,9 +6,9 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
-import com.tirsweb.datamining.Cluster;
-import com.tirsweb.datamining.kMeans;
-import com.tirsweb.datamining.kMeansPoint;
+import com.tirsweb.datamining.cluster.Cluster;
+import com.tirsweb.datamining.cluster.kMeans;
+import com.tirsweb.datamining.cluster.kMeansPoint;
 import com.tirsweb.model.Point;
 import com.tirsweb.util.cache.Cache;
 

@@ -9,7 +9,7 @@ package com.tirsweb.datamining;
 
 import java.util.ArrayList;
 
-import com.tirsweb.util.gps.GeoDistance;
+import com.tirsweb.util.FileHelper;
 
 public class Test {
 	/*public static void main(String[] args) {
@@ -105,13 +105,13 @@ public class Test {
 	}*/
 	
 	
-	public static void main(String[] args) {
-	/*	double lat1 = 30.282788;
+	/*public static void main(String[] args) {
+		double lat1 = 30.282788;
 		double lng1 = 120.081875;
 		double lat2 = 30.289234;
 		double lng2 = 120.080856;
 		double dis = GeoDistance.computeCompareDistance(lat1, lng1, lat2, lng2);
-		System.out.println(dis);*/
+		System.out.println(dis);
 		
 		StringBuffer sb = new StringBuffer(4012);
 		for(int i=1; i<=4000; i++) {
@@ -119,6 +119,22 @@ public class Test {
 		}
 		
 		System.out.println("sb = " + sb.toString());
+		
+	}*/
+	
+	
+	public static void main(String[] args) {
+		
+		int i=11;
+		ArrayList<String> sqlList = new ArrayList<String>();
+		for(; i<100; i++) {
+			String sql = "insert into tb_gps_1112_trip_test2 values("+i+", 2, 2, 120.0, 30.0, 0, 0, 0, 0, 1, 0, TO_DATE('2012-12-12 12:12:12', 'yyyy-mm-dd hh24:mi:ss'), TO_DATE('2012-12-12 12:12:12', 'yyyy-mm-dd hh24:mi:ss'), null);";
+			sqlList.add(sql);
+		}
+		
+		FileHelper f = new FileHelper("temp.txt", "append", sqlList);
+		f.write();
+		f.close();
 		
 	}
 	

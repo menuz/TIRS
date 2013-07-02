@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.tirsweb.dao.jdbc.DBDAO;
+import com.tirsweb.dao.DBDAO;
 import com.tirsweb.model.Arc;
 import com.tirsweb.model.ArcDetail;
 import com.tirsweb.model.ArcDis;

@@ -17,8 +17,6 @@ public class ComparatorPLCluster implements Comparator{
 	public int compare(Object o1, Object o2) {
 		ParkingLocationCluster plCluster1 = (ParkingLocationCluster)o1;
 		ParkingLocationCluster plCluster2 = (ParkingLocationCluster)o2;
-		
-		
 		return 0;
 	}
 

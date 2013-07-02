@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.tirsweb.dao.jdbc.ArcToBoxDAO;
+import com.tirsweb.dao.ArcToBoxDAO;
 import com.tirsweb.model.ParkingLocation;
 import com.tirsweb.model.Point;
 import com.tirsweb.model.Trip;

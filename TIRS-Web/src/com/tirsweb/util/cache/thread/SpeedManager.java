@@ -12,7 +12,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
-import com.tirsweb.dao.datasource.CacheDAO;
+import com.tirsweb.dao.CacheDAO;
 import com.tirsweb.model.Speed;
 import com.tirsweb.util.FileHelper;
 import com.tirsweb.util.TimeUtil;

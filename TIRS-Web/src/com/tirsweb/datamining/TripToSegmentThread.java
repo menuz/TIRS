@@ -10,7 +10,7 @@ package com.tirsweb.datamining;
 import java.util.ArrayList;
 import java.util.Map;
 
-import com.tirsweb.dao.jdbc.TripToSegmentListDAO;
+import com.tirsweb.dao.TripToSegmentListDAO;
 import com.tirsweb.model.Arc;
 import com.tirsweb.model.Node;
 import com.tirsweb.model.TbArcSpeed;

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-import com.tirsweb.dao.jdbc.RouteDAO;
+import com.tirsweb.dao.RouteDAO;
 import com.tirsweb.model.BaseArc;
 import com.tirsweb.model.Node;
 import com.tirsweb.model.Speed;

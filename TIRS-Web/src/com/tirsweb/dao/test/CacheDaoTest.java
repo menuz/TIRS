@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.tirsweb.dao.datasource.CacheDAO;
+import com.tirsweb.dao.CacheDAO;
 import com.tirsweb.model.Point;
 
 public class CacheDaoTest {

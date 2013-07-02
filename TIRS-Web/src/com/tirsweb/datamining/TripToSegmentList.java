@@ -13,7 +13,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.tirsweb.dao.jdbc.DAO4;
+import com.tirsweb.dao.JCacheDAO;
+import com.tirsweb.datamining.util.SpeedFilter;
 import com.tirsweb.model.Arc;
 import com.tirsweb.model.ArcDetail;
 import com.tirsweb.model.Box;
@@ -21,7 +22,6 @@ import com.tirsweb.model.Node;
 import com.tirsweb.model.Point;
 import com.tirsweb.model.TbArcSpeed;
 import com.tirsweb.model.Trip;
-import com.tirsweb.util.FileHelper;
 import com.tirsweb.util.cache.JCache;
 import com.tirsweb.util.gps.Angle;
 import com.tirsweb.util.gps.GeoDistance;
@@ -52,7 +52,7 @@ public class TripToSegmentList {
 		nodes = cache.getAllNode();
 
 		// transfer arc to min arc
-		DAO4 dao = new DAO4();
+		JCacheDAO dao = new JCacheDAO();
 		//
 		arcAndOppositeArcMap = new HashMap<Integer, Integer>();
 		dao.getArcMap(arcAndOppositeArcMap);

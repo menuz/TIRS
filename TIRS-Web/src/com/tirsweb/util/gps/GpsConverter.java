@@ -13,10 +13,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DecimalFormat;
 
-import com.tirsweb.dao.JDBCDAO;
+import com.tirsweb.dao.BaseDAO;
 import com.tirsweb.model.Point;
 
-public class GpsConverter extends JDBCDAO{
+public class GpsConverter extends BaseDAO{
+	
+	public GpsConverter() {
+		super(BaseDAO.JDBC);
+	}
 	
 	public Point gpsToMarGps(double latitude, double longitude) {
 		DecimalFormat df = new DecimalFormat("###.00");
